@@ -6,55 +6,81 @@ let isBlowing = false;
 let blowDuration = 0;
 let animationId;
 
-// Switch screens helper
-function switchScreen(fromId, toId) {
-    document.getElementById(fromId).classList.remove('active');
+function switchScreen(fromId, toId, delay = 1500) {
+    const fromEl = document.getElementById(fromId);
+    const toEl = document.getElementById(toId);
+    if(fromEl) fromEl.classList.remove('active');
     setTimeout(() => {
-        document.getElementById(toId).classList.add('active');
-    }, 1500);
+        if(toEl) toEl.classList.add('active');
+    }, delay);
 }
 
-// User images config (can be updated by user)
-const memoryImages = [
-    'assets/photo1.jpg',
-    'assets/photo2.jpg',
-    'assets/photo3.jpg',
-    'assets/photo4.jpg'
+// User memory photos and their corresponding cinematic texts
+const memories = [
+    { src: 'assets/photo1.jpg', text: '너라는 사람을 만나,<br>나의 세상은 온통 따뜻한 빛이 되었어.' },
+    { src: 'assets/photo2.jpg', text: '둘이 아닌 셋이 되어 맞이하는 지금,<br>이 순간이 꿈만 같아.' },
+    { src: 'assets/photo3.jpg', text: '우리 뀰이와 함께할<br>찬란한 앞날들이 너무나 기대돼.' },
+    { src: 'assets/photo4.jpg', text: '때론 힘들어도, 내가 언제나<br>너와 뀰이의 가장 든든한 울타리가 되어줄게.' }
 ];
 
 async function startApp() {
-    // Attempt to play BGM
     const bgm = document.getElementById('bgMusic');
     if(bgm) {
         bgm.volume = 0.5;
-        bgm.play().catch(e => console.log("BGM play failed (maybe no file yet)", e));
+        bgm.play().catch(e => console.log("BGM play failed", e));
     }
 
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
         microphone = audioContext.createMediaStreamSource(stream);
-        
         microphone.connect(analyser);
-        
         analyser.fftSize = 256;
         const bufferLength = analyser.frequencyBinCount;
         dataArray = new Uint8Array(bufferLength);
         
-        switchScreen('introScreen', 'cakeScreen');
-        checkAudioVolume();
-        
+        runCinematicSequence();
     } catch (err) {
         alert("마이크 권한이 거부되었거나 지원하지 않는 기기입니다. 촛불을 터치해서 진행할 수 있습니다!");
-        switchScreen('introScreen', 'cakeScreen');
+        runCinematicSequence(false); // Run without mic logic
     }
+}
+
+function runCinematicSequence(micEnabled = true) {
+    // 1. Hide intro, show prologue
+    switchScreen('introScreen', 'prologueScreen', 1000);
+    
+    // 2. Play Prologue texts
+    setTimeout(() => {
+        const text1 = document.getElementById('prologueText1');
+        text1.classList.add('show');
+        
+        setTimeout(() => {
+            text1.classList.remove('show');
+            setTimeout(() => {
+                const text2 = document.getElementById('prologueText2');
+                text2.classList.add('show');
+                
+                setTimeout(() => {
+                    text2.classList.remove('show');
+                    
+                    // 3. Move to Candle screen
+                    setTimeout(() => {
+                        switchScreen('prologueScreen', 'cakeScreen', 500);
+                        if (micEnabled) {
+                            setTimeout(checkAudioVolume, 2000); // Start listening after candle shows
+                        }
+                    }, 2000);
+                    
+                }, 4000);
+            }, 2000);
+        }, 4000);
+    }, 2000);
 }
 
 function checkAudioVolume() {
     if (isBlowing) return; 
-    
     analyser.getByteFrequencyData(dataArray);
     
     let sum = 0;
@@ -82,7 +108,6 @@ function checkAudioVolume() {
     } else {
         blowDuration = 0; 
     }
-    
     animationId = requestAnimationFrame(checkAudioVolume);
 }
 
@@ -95,24 +120,74 @@ function blowOutCandle() {
     flame.classList.add('blown-out');
     
     setTimeout(() => {
-        document.getElementById('cakeScreen').classList.remove('active');
-        document.getElementById('darkScreen').classList.add('active');
+        switchScreen('cakeScreen', 'darkScreen', 1000);
         
+        // After dark screen, start Memory Sequence
         setTimeout(() => {
-            document.getElementById('darkScreen').classList.remove('active');
-            document.getElementById('proposalScreen').classList.add('active');
-            createFlowers();
-            createMemories(); // Scatter memory photos
-        }, 2000);
+            switchScreen('darkScreen', 'memoryScreen', 500);
+            setTimeout(playMemorySequence, 2000);
+        }, 3000);
         
     }, 1500);
 }
 
-// Fallback: Click the candle to blow it out
+// Fallback: Click the candle
 document.getElementById('candleWrapper').addEventListener('click', () => {
     blowOutCandle();
 });
 
+function playMemorySequence() {
+    const container = document.getElementById('memoryContainer');
+    
+    let currentStep = 0;
+    
+    function showNextMemory() {
+        if (currentStep >= memories.length) {
+            // End of memories, move to proposal
+            switchScreen('memoryScreen', 'proposalScreen', 1500);
+            createFlowers();
+            scatterMemoriesBackground();
+            return;
+        }
+        
+        const mem = memories[currentStep];
+        
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'memory-step';
+        
+        const img = document.createElement('img');
+        img.src = mem.src;
+        // if image fails, hide it so only text shows
+        img.onerror = () => { img.style.display = 'none'; };
+        
+        const p = document.createElement('p');
+        p.innerHTML = mem.text;
+        
+        stepDiv.appendChild(img);
+        stepDiv.appendChild(p);
+        container.appendChild(stepDiv);
+        
+        // Fade in
+        setTimeout(() => {
+            stepDiv.classList.add('show');
+            
+            // Wait, then fade out
+            setTimeout(() => {
+                stepDiv.classList.remove('show');
+                
+                // Wait for fade out, then next memory
+                setTimeout(() => {
+                    stepDiv.remove();
+                    currentStep++;
+                    showNextMemory();
+                }, 2000);
+                
+            }, 6000); // How long each photo is shown
+        }, 100);
+    }
+    
+    showNextMemory();
+}
 
 function createFlowers() {
     const container = document.getElementById('flowers');
@@ -124,63 +199,54 @@ function createFlowers() {
             const size = Math.random() * 250 + 100;
             flower.style.width = `${size}px`;
             flower.style.height = `${size}px`;
-            
             flower.style.left = `${Math.random() * 100}vw`;
             flower.style.top = `${Math.random() * 100}vh`;
             
             const hues = [35, 45, 55, 0];
             const hue = hues[Math.floor(Math.random() * hues.length)];
             flower.style.background = `radial-gradient(circle, hsla(${hue}, 100%, 85%, 0.4) 0%, transparent 60%)`;
-            
             container.appendChild(flower);
         }, i * 200);
     }
 }
 
-function createMemories() {
-    const container = document.getElementById('memories');
+function scatterMemoriesBackground() {
+    const container = document.getElementById('scatteredMemories');
     
-    memoryImages.forEach((src, index) => {
+    memories.forEach((mem, index) => {
         setTimeout(() => {
             const polaroid = document.createElement('div');
-            polaroid.classList.add('memory-photo');
+            polaroid.classList.add('scattered-photo');
             
-            // Random positioning around the screen
             const isLeft = Math.random() > 0.5;
-            const x = isLeft ? Math.random() * 20 : 60 + Math.random() * 20; // 0-20vw or 60-80vw
-            const y = Math.random() * 60 + 10; // 10-70vh
-            const rotation = Math.random() * 40 - 20; // -20 to 20 deg
+            const x = isLeft ? Math.random() * 20 : 60 + Math.random() * 20; 
+            const y = Math.random() * 60 + 10; 
+            const rotation = Math.random() * 40 - 20; 
             
             polaroid.style.left = `${x}vw`;
             polaroid.style.top = `${y}vh`;
             
-            // Image setup
             const img = document.createElement('img');
-            img.src = src;
-            
-            // If image fails to load (user didn't add it yet), hide it or show placeholder
+            img.src = mem.src;
             img.onerror = () => { polaroid.style.display = 'none'; };
             
-            // Polaroid sizing
-            polaroid.style.width = `${Math.random() * 100 + 150}px`; // 150-250px
+            polaroid.style.width = `${Math.random() * 80 + 120}px`; 
             polaroid.style.height = `${parseFloat(polaroid.style.width) * 1.2}px`;
             
             polaroid.appendChild(img);
             container.appendChild(polaroid);
             
-            // Trigger animation
             setTimeout(() => {
                 polaroid.classList.add('show');
                 polaroid.style.transform = `scale(1) rotate(${rotation}deg)`;
             }, 50);
             
-        }, index * 800); // Stagger appearance
+        }, index * 400); 
     });
 }
 
-// "No" button escaping logic
+// "No" button escaping
 const noBtn = document.getElementById('noBtn');
-
 function moveNoBtn() {
     noBtn.style.position = 'fixed';
     const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40) + 20;
@@ -188,51 +254,22 @@ function moveNoBtn() {
     noBtn.style.left = `${x}px`;
     noBtn.style.top = `${y}px`;
 }
-
 noBtn.addEventListener('mouseover', moveNoBtn);
-noBtn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    moveNoBtn();
-});
+noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoBtn(); });
 
-// Premium Confetti
 function acceptProposal() {
-    switchScreen('proposalScreen', 'successScreen');
-    
+    switchScreen('proposalScreen', 'successScreen', 500);
     var duration = 4000;
     var end = Date.now() + duration;
     var colors = ['#e5a872', '#ffffff', '#ffd700'];
 
     (function frame() {
-        confetti({
-            particleCount: 5,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0 },
-            colors: colors,
-            zIndex: 10000
-        });
-        confetti({
-            particleCount: 5,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1 },
-            colors: colors,
-            zIndex: 10000
-        });
-
-        if (Date.now() < end) {
-            requestAnimationFrame(frame);
-        }
+        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors, zIndex: 10000 });
+        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors, zIndex: 10000 });
+        if (Date.now() < end) requestAnimationFrame(frame);
     }());
 
     setTimeout(() => {
-        confetti({
-            particleCount: 100,
-            spread: 160,
-            origin: { y: 0.6 },
-            colors: colors,
-            zIndex: 10000
-        });
+        confetti({ particleCount: 100, spread: 160, origin: { y: 0.6 }, colors: colors, zIndex: 10000 });
     }, 800);
 }
