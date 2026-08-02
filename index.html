@@ -17,15 +17,18 @@
         </audio>
 
         <!-- Scene 0: Permission & Start -->
-        <section id="introScreen" class="screen active">
-            <div class="content intro-content" style="padding: 5rem 3rem;">
-                <h1 class="fade-in delay-1" style="font-size: 2.2rem; font-weight: 200; margin-bottom: 1.5rem; color: rgba(255,255,255,0.95); letter-spacing: 1px;">
-                    To. 나의 우주인 너에게
+        <section id="introScreen" class="screen active" style="overflow: hidden; background: #000;">
+            <!-- Cinematic Background -->
+            <div class="intro-bg"></div>
+            <!-- Particles Container -->
+            <div id="introParticles"></div>
+            
+            <div class="content intro-content" style="padding: 5rem 3rem; z-index: 10; background: transparent; border: none; box-shadow: none; backdrop-filter: none;">
+                <h1 id="typewriter1" style="font-size: 2.2rem; font-weight: 200; margin-bottom: 1.5rem; color: rgba(255,255,255,0.95); letter-spacing: 1px; min-height: 40px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
                 </h1>
-                <p class="fade-in delay-2" style="font-size: 1.15rem; color: rgba(255,255,255,0.6); margin-bottom: 3.5rem; font-weight: 200; line-height: 1.8;">
-                    수많은 기적들이 모여 완성된 우리의 시간.<br>가장 빛나는 오늘, 너를 위해 준비했어.
+                <p id="typewriter2" style="font-size: 1.15rem; color: rgba(255,255,255,0.8); margin-bottom: 3.5rem; font-weight: 200; line-height: 1.8; min-height: 60px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
                 </p>
-                <button class="btn fade-in delay-3" onclick="startApp()" style="padding: 16px 42px; font-size: 1.15rem; letter-spacing: 2px;">우리의 이야기 열어보기</button>
+                <button class="btn" id="startBtn" onclick="startApp()" style="padding: 16px 42px; font-size: 1.15rem; letter-spacing: 2px; opacity: 0; transform: translateY(15px); transition: all 1s ease;">우리의 이야기 열어보기</button>
             </div>
         </section>
 

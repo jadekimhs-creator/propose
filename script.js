@@ -1,3 +1,69 @@
+document.addEventListener('DOMContentLoaded', () => {
+    // Generate intro particles
+    const introParticles = document.getElementById('introParticles');
+    if (introParticles) {
+        for (let i = 0; i < 40; i++) {
+            const p = document.createElement('div');
+            p.classList.add('intro-particle');
+            const size = Math.random() * 8 + 4;
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+            p.style.left = `${Math.random() * 100}vw`;
+            p.style.top = `${Math.random() * 100}vh`;
+            p.style.setProperty('--duration', `${Math.random() * 5 + 5}s`);
+            p.style.setProperty('--delay', `${Math.random() * 5}s`);
+            p.style.setProperty('--max-opacity', `${Math.random() * 0.6 + 0.2}`);
+            introParticles.appendChild(p);
+        }
+    }
+
+    // Typewriter effect
+    const t1 = "To. 나의 우주인 너에게";
+    const t2 = "수많은 기적들이 모여 완성된 우리의 시간.<br>가장 빛나는 오늘, 너를 위해 준비했어.";
+    
+    let i = 0;
+    const speed = 100;
+    const el1 = document.getElementById('typewriter1');
+    const el2 = document.getElementById('typewriter2');
+    const startBtn = document.getElementById('startBtn');
+    
+    if (el1 && el2) {
+        el1.classList.add('typing-cursor');
+        
+        function typeWriter1() {
+            if (i < t1.length) {
+                el1.innerHTML += t1.charAt(i);
+                i++;
+                setTimeout(typeWriter1, speed);
+            } else {
+                el1.classList.remove('typing-cursor');
+                el2.classList.add('typing-cursor');
+                setTimeout(typeWriter2, 500);
+            }
+        }
+        
+        let j = 0;
+        let isHTML = false;
+        function typeWriter2() {
+            if (j < t2.length) {
+                if (t2.charAt(j) === '<') isHTML = true;
+                el2.innerHTML += t2.charAt(j);
+                if (t2.charAt(j) === '>') isHTML = false;
+                j++;
+                setTimeout(typeWriter2, isHTML ? 0 : speed - 40);
+            } else {
+                el2.classList.remove('typing-cursor');
+                setTimeout(() => {
+                    startBtn.style.opacity = '1';
+                    startBtn.style.transform = 'translateY(0)';
+                }, 500);
+            }
+        }
+        
+        setTimeout(typeWriter1, 1000);
+    }
+});
+
 let isBlowing = false;
 
 function switchScreen(fromId, toId, delay = 1500) {
