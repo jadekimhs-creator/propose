@@ -19,8 +19,9 @@ function switchScreen(fromId, toId, delay = 1500) {
 const memories = [
     { src: 'assets/photo1.jpg', text: '너라는 사람을 만나,<br>나의 세상은 온통 따뜻한 빛이 되었어.' },
     { src: 'assets/photo2.jpg', text: '둘이 아닌 셋이 되어 맞이하는 지금,<br>이 순간이 꿈만 같아.' },
-    { src: 'assets/photo3.jpg', text: '우리 뀰이와 함께할<br>찬란한 앞날들이 너무나 기대돼.' },
-    { src: 'assets/photo4.jpg', text: '때론 힘들어도, 내가 언제나<br>너와 뀰이의 가장 든든한 울타리가 되어줄게.' }
+    // 뀰이 이미지 전용! (ggyul.jpg)
+    { src: 'assets/ggyul.jpg', text: '뀰이와 만난 지 15주 2일차,<br>우리 뀰이와 함께할 찬란한 앞날들이 너무나 기대돼.' },
+    { src: 'assets/photo3.jpg', text: '때론 힘들어도, 내가 언제나<br>너와 뀰이의 가장 든든한 울타리가 되어줄게.' }
 ];
 
 async function startApp() {
@@ -43,15 +44,13 @@ async function startApp() {
         runCinematicSequence();
     } catch (err) {
         alert("마이크 권한이 거부되었거나 지원하지 않는 기기입니다. 촛불을 터치해서 진행할 수 있습니다!");
-        runCinematicSequence(false); // Run without mic logic
+        runCinematicSequence(false);
     }
 }
 
 function runCinematicSequence(micEnabled = true) {
-    // 1. Hide intro, show prologue
     switchScreen('introScreen', 'prologueScreen', 1000);
     
-    // 2. Play Prologue texts
     setTimeout(() => {
         const text1 = document.getElementById('prologueText1');
         text1.classList.add('show');
@@ -65,11 +64,10 @@ function runCinematicSequence(micEnabled = true) {
                 setTimeout(() => {
                     text2.classList.remove('show');
                     
-                    // 3. Move to Candle screen
                     setTimeout(() => {
                         switchScreen('prologueScreen', 'cakeScreen', 500);
                         if (micEnabled) {
-                            setTimeout(checkAudioVolume, 2000); // Start listening after candle shows
+                            setTimeout(checkAudioVolume, 2000);
                         }
                     }, 2000);
                     
@@ -122,7 +120,6 @@ function blowOutCandle() {
     setTimeout(() => {
         switchScreen('cakeScreen', 'darkScreen', 1000);
         
-        // After dark screen, start Memory Sequence
         setTimeout(() => {
             switchScreen('darkScreen', 'memoryScreen', 500);
             setTimeout(playMemorySequence, 2000);
@@ -131,19 +128,16 @@ function blowOutCandle() {
     }, 1500);
 }
 
-// Fallback: Click the candle
 document.getElementById('candleWrapper').addEventListener('click', () => {
     blowOutCandle();
 });
 
 function playMemorySequence() {
     const container = document.getElementById('memoryContainer');
-    
     let currentStep = 0;
     
     function showNextMemory() {
         if (currentStep >= memories.length) {
-            // End of memories, move to proposal
             switchScreen('memoryScreen', 'proposalScreen', 1500);
             createFlowers();
             scatterMemoriesBackground();
@@ -151,13 +145,11 @@ function playMemorySequence() {
         }
         
         const mem = memories[currentStep];
-        
         const stepDiv = document.createElement('div');
         stepDiv.className = 'memory-step';
         
         const img = document.createElement('img');
         img.src = mem.src;
-        // if image fails, hide it so only text shows
         img.onerror = () => { img.style.display = 'none'; };
         
         const p = document.createElement('p');
@@ -167,25 +159,18 @@ function playMemorySequence() {
         stepDiv.appendChild(p);
         container.appendChild(stepDiv);
         
-        // Fade in
         setTimeout(() => {
             stepDiv.classList.add('show');
-            
-            // Wait, then fade out
             setTimeout(() => {
                 stepDiv.classList.remove('show');
-                
-                // Wait for fade out, then next memory
                 setTimeout(() => {
                     stepDiv.remove();
                     currentStep++;
                     showNextMemory();
                 }, 2000);
-                
-            }, 6000); // How long each photo is shown
+            }, 6000); 
         }, 100);
     }
-    
     showNextMemory();
 }
 
@@ -245,7 +230,6 @@ function scatterMemoriesBackground() {
     });
 }
 
-// "No" button escaping
 const noBtn = document.getElementById('noBtn');
 function moveNoBtn() {
     noBtn.style.position = 'fixed';
