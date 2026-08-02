@@ -9,3 +9,13 @@ test('proposal markup uses a real-life cue without response buttons', () => {
   assert.match(html, /id="lookUpCue"/);
   assert.doesNotMatch(html, /id="proposalBtns"|id="noBtn"/);
 });
+
+test('defines five camera variants and the two-second final beat', () => {
+  const script = fs.readFileSync('script.js', 'utf8');
+
+  for (const variant of ['slow-zoom', 'print', 'pan', 'glow', 'finale']) {
+    assert.match(script, new RegExp(`variant: '${variant}'`));
+  }
+  assert.match(script, /const FINAL_SILENT_BEAT_MS = 2000/);
+  assert.doesNotMatch(script, /function createFlowers|function moveNoBtn/);
+});

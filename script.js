@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let isBlowing = false;
+const FINAL_SILENT_BEAT_MS = 2000;
 
 function switchScreen(fromId, toId, delay = 1500) {
     const fromEl = document.getElementById(fromId);
@@ -166,13 +167,31 @@ function typeSequence(elements, speed, delayBetween, onComplete) {
     next();
 }
 
+function revealSequence(elements, visibleMs, delayBetween, onComplete) {
+    let index = 0;
+    function next() {
+        if (index >= elements.length) {
+            if (onComplete) onComplete();
+            return;
+        }
+        const element = elements[index];
+        element.innerHTML = element.getAttribute('data-text').replace(/\\n|\n/g, '<br>');
+        element.classList.add('reveal-copy');
+        setTimeout(() => {
+            index++;
+            setTimeout(next, delayBetween);
+        }, visibleMs);
+    }
+    next();
+}
+
 // User memory photos and their corresponding cinematic texts
 const memories = [
-    { src: 'assets/photo1.jpg', text: '바라던 사람을 만나,\n나의 세상은 온통 따뜻한 빛이 되었어.' },
-    { src: 'assets/gom.jpg', text: '2022년 너의 생일, 함께했던 천사 곰이도 있지?\n지금쯤 하늘의 가장 밝은 별이 된 곰이가 누구보다 크게 축하해주고 있을 거야.' },
-    { src: 'assets/photo2.jpg', text: '곰이가 보내준 따뜻한 사랑까지 듬뿍 받아,\n이제는 완전한 가족이 되어 맞이하는 특별한 생일.' },
-    { src: 'assets/ggyul.jpg', text: '뀰이를 만난 지 15주 2일차,\n우리 셋이서 함께할 찬란한 나날들이 너무도 기대돼.' },
-    { src: 'assets/photo3.jpg', text: '마음의 응원을 가득 곰이, 뱃속 뀰이, 그리고 우리 두 사람.\n내가 가장 든든한 남편이자 아빠가 되어 평생 지켜줄게.' }
+    { src: 'assets/photo1.jpg', text: '바라던 사람을 만나,\n나의 세상은 온통 따뜻한 빛이 되었어.', variant: 'slow-zoom' },
+    { src: 'assets/gom.jpg', text: '2022년 너의 생일, 함께했던 천사 곰이도 있지?\n지금쯤 하늘의 가장 밝은 별이 된 곰이가 누구보다 크게 축하해주고 있을 거야.', variant: 'print' },
+    { src: 'assets/photo2.jpg', text: '곰이가 보내준 따뜻한 사랑까지 듬뿍 받아,\n이제는 완전한 가족이 되어 맞이하는 특별한 생일.', variant: 'pan' },
+    { src: 'assets/ggyul.jpg', text: '뀰이를 만난 지 15주 2일차,\n우리 셋이서 함께할 찬란한 나날들이 너무도 기대돼.', variant: 'glow' },
+    { src: 'assets/photo3.jpg', text: '마음의 응원을 가득 곰이, 뱃속 뀰이, 그리고 우리 두 사람.\n내가 가장 든든한 남편이자 아빠가 되어 평생 지켜줄게.', variant: 'finale' }
 ];
 
 async function startApp() {
@@ -189,7 +208,7 @@ function runCinematicSequence() {
     
     setTimeout(() => {
         const elements = document.querySelectorAll('#prologueScreen .typewriter-element');
-        typeSequence(elements, 150, 1000, () => {
+        revealSequence(elements, 2200, 700, () => {
             setTimeout(() => {
                 switchScreen('prologueScreen', 'cakeScreen', 1000);
                 startCakeScene();
@@ -203,8 +222,12 @@ function startCakeScene() {
         const elements = document.querySelectorAll('#cakeScreen .typewriter-element');
         const cakeVisual = document.getElementById('cakeVisual');
         
-        typeSequence(elements, 130, 700, () => {
-            cakeVisual.style.opacity = '1';
+        revealSequence(Array.from(elements).slice(0, 2), 1700, 350, () => {
+            typeText(elements[2], 75, () => {
+                elements[3].innerHTML = elements[3].getAttribute('data-text');
+                elements[3].classList.add('reveal-copy');
+                cakeVisual.style.opacity = '1';
+            });
         });
     }, 1000);
 }
@@ -214,7 +237,9 @@ function blowOutCandle() {
     isBlowing = true;
     
     const flame = document.getElementById('flame');
+    const bgm = document.getElementById('bgMusic');
     flame.classList.add('blown-out');
+    if (bgm) bgm.volume = 0.07;
     
     setTimeout(() => {
         switchScreen('cakeScreen', 'darkScreen', 1000);
@@ -238,23 +263,20 @@ function playMemorySequence() {
     function showNextMemory() {
         if (currentStep >= memories.length) {
             switchScreen('memoryScreen', 'proposalScreen', 1500);
-            createFlowers();
-            scatterMemoriesBackground();
             startProposalScene();
             return;
         }
         
         const mem = memories[currentStep];
         const stepDiv = document.createElement('div');
-        stepDiv.className = 'memory-step';
+        stepDiv.className = `memory-step memory-step--${mem.variant}`;
         
         const img = document.createElement('img');
         img.src = mem.src;
         img.onerror = () => { img.style.display = 'none'; };
         
         const p = document.createElement('p');
-        p.className = 'typewriter-element';
-        p.setAttribute('data-text', mem.text);
+        p.textContent = mem.text;
         
         stepDiv.appendChild(img);
         stepDiv.appendChild(p);
@@ -262,138 +284,35 @@ function playMemorySequence() {
         
         setTimeout(() => {
             stepDiv.classList.add('show');
+            setTimeout(() => p.classList.add('show-caption'), 700);
             setTimeout(() => {
-                // Type moderately for memories so photos stay longer
-                typeText(p, 100, () => {
-                    setTimeout(() => {
-                        stepDiv.classList.remove('show');
-                        setTimeout(() => {
-                            stepDiv.remove();
-                            currentStep++;
-                            showNextMemory();
-                        }, 1000); 
-                    }, 2500); 
-                });
-            }, 500);
+                stepDiv.classList.remove('show');
+                setTimeout(() => {
+                    stepDiv.remove();
+                    currentStep++;
+                    showNextMemory();
+                }, 700);
+            }, 4300);
         }, 100);
     }
     showNextMemory();
 }
 
-function createFlowers() {
-    const container = document.getElementById('flowers');
-    for (let i = 0; i < 20; i++) {
-        setTimeout(() => {
-            const flower = document.createElement('div');
-            flower.classList.add('flower-particle');
-            
-            const size = Math.random() * 250 + 100;
-            flower.style.width = `${size}px`;
-            flower.style.height = `${size}px`;
-            flower.style.left = `${Math.random() * 100}vw`;
-            flower.style.top = `${Math.random() * 100}vh`;
-            
-            const hues = [35, 45, 55, 0];
-            const hue = hues[Math.floor(Math.random() * hues.length)];
-            flower.style.background = `radial-gradient(circle, hsla(${hue}, 100%, 85%, 0.4) 0%, transparent 60%)`;
-            container.appendChild(flower);
-        }, i * 200);
-    }
-}
-
-function scatterMemoriesBackground() {
-    const container = document.getElementById('scatteredMemories');
-    
-    memories.forEach((mem, index) => {
-        setTimeout(() => {
-            const polaroid = document.createElement('div');
-            polaroid.classList.add('scattered-photo');
-            
-            const isLeft = Math.random() > 0.5;
-            const x = isLeft ? Math.random() * 20 : 60 + Math.random() * 20; 
-            const y = Math.random() * 60 + 10; 
-            const rotation = Math.random() * 40 - 20; 
-            
-            polaroid.style.left = `${x}vw`;
-            polaroid.style.top = `${y}vh`;
-            
-            const img = document.createElement('img');
-            img.src = mem.src;
-            img.onerror = () => { polaroid.style.display = 'none'; };
-            
-            polaroid.style.width = `${Math.random() * 80 + 120}px`; 
-            polaroid.style.height = `${parseFloat(polaroid.style.width) * 1.2}px`;
-            
-            polaroid.appendChild(img);
-            container.appendChild(polaroid);
-            
-            setTimeout(() => {
-                polaroid.classList.add('show');
-                polaroid.style.transform = `scale(1) rotate(${rotation}deg)`;
-            }, 50);
-            
-        }, index * 400); 
-    });
-}
-
 function startProposalScene() {
     setTimeout(() => {
-        const elements = document.querySelectorAll('#proposalScreen .typewriter-element');
-        const btns = document.getElementById('proposalBtns');
-        
-        typeSequence(elements, 150, 800, () => {
-            btns.style.opacity = '1';
-            btns.style.transform = 'translateY(0)';
+        const promises = document.querySelectorAll('#proposalScreen .typewriter-element');
+        const question = document.getElementById('finalProposalQuestion');
+        const cue = document.getElementById('lookUpCue');
+        const bgm = document.getElementById('bgMusic');
+        revealSequence(promises, 1800, 400, () => {
+            if (bgm) bgm.volume = 0.05;
+            question.setAttribute('data-text', '나와 결혼해 줄래? 💍');
+            typeText(question, 130, () => {
+                setTimeout(() => {
+                    cue.textContent = '고개를 들어 나를 바라봐줄래? 💐';
+                    cue.classList.add('reveal-copy');
+                }, FINAL_SILENT_BEAT_MS);
+            });
         });
     }, 1500);
-}
-
-const noBtn = document.getElementById('noBtn');
-function moveNoBtn() {
-    noBtn.style.position = 'fixed';
-    const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40) + 20;
-    const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40) + 20;
-    noBtn.style.left = `${x}px`;
-    noBtn.style.top = `${y}px`;
-}
-noBtn.addEventListener('mouseover', moveNoBtn);
-noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoBtn(); });
-
-function acceptProposal() {
-    switchScreen('proposalScreen', 'successScreen', 500);
-    
-    // Create Starfield Effect
-    const starfield = document.getElementById('starfield');
-    if (starfield) {
-        for (let i = 0; i < 150; i++) {
-            setTimeout(() => {
-                const star = document.createElement('div');
-                star.classList.add('star');
-                
-                const size = Math.random() * 3 + 1;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                
-                star.style.left = `${Math.random() * 100}vw`;
-                star.style.top = `${Math.random() * 100}vh`;
-                
-                star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
-                star.style.setProperty('--delay', `${Math.random() * 2}s`);
-                star.style.setProperty('--max-opacity', `${Math.random() * 0.7 + 0.3}`);
-                
-                starfield.appendChild(star);
-            }, i * 20);
-        }
-    }
-    
-    setTimeout(() => {
-        const line = document.getElementById('successLine');
-        line.style.opacity = '0.8';
-        line.style.height = '60px';
-        
-        setTimeout(() => {
-            const elements = document.querySelectorAll('#successScreen .typewriter-element');
-            typeSequence(elements, 160, 900);
-        }, 1500);
-    }, 1000);
 }
