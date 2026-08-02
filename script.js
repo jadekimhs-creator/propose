@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const t2 = "수많은 기적들이 모여 완성된 우리의 시간.\n가장 빛나는 오늘, 너를 위해 준비했어.";
     
     let i = 0;
-    const speed = 130;
+    const speed = 200; // Drastically slower
     const el1 = document.getElementById('typewriter1');
     const el2 = document.getElementById('typewriter2');
     const startBtn = document.getElementById('startBtn');
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     el2.innerHTML += char;
                 }
                 j++;
-                setTimeout(typeWriter2, speed - 20);
+                setTimeout(typeWriter2, speed - 30);
             } else {
                 el2.classList.remove('typing-cursor');
                 setTimeout(() => {
@@ -151,11 +151,11 @@ function runCinematicSequence() {
     
     setTimeout(() => {
         const elements = document.querySelectorAll('#prologueScreen .typewriter-element');
-        typeSequence(elements, 120, 800, () => {
+        typeSequence(elements, 180, 1000, () => {
             setTimeout(() => {
                 switchScreen('prologueScreen', 'cakeScreen', 1000);
                 startCakeScene();
-            }, 2000);
+            }, 2500);
         });
     }, 1500);
 }
@@ -165,7 +165,7 @@ function startCakeScene() {
         const elements = document.querySelectorAll('#cakeScreen .typewriter-element');
         const cakeVisual = document.getElementById('cakeVisual');
         
-        typeSequence(elements, 100, 500, () => {
+        typeSequence(elements, 150, 700, () => {
             cakeVisual.style.opacity = '1';
         });
     }, 1000);
@@ -225,8 +225,8 @@ function playMemorySequence() {
         setTimeout(() => {
             stepDiv.classList.add('show');
             setTimeout(() => {
-                // Type fast for memories
-                typeText(p, 65, () => {
+                // Type moderately for memories so photos stay longer
+                typeText(p, 120, () => {
                     setTimeout(() => {
                         stepDiv.classList.remove('show');
                         setTimeout(() => {
@@ -303,7 +303,7 @@ function startProposalScene() {
         const elements = document.querySelectorAll('#proposalScreen .typewriter-element');
         const btns = document.getElementById('proposalBtns');
         
-        typeSequence(elements, 110, 600, () => {
+        typeSequence(elements, 180, 800, () => {
             btns.style.opacity = '1';
             btns.style.transform = 'translateY(0)';
         });
@@ -355,7 +355,7 @@ function acceptProposal() {
         
         setTimeout(() => {
             const elements = document.querySelectorAll('#successScreen .typewriter-element');
-            typeSequence(elements, 120, 700);
+            typeSequence(elements, 180, 900);
         }, 1500);
     }, 1000);
 }
