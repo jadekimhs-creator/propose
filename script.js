@@ -243,17 +243,29 @@ noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoBtn(); }
 
 function acceptProposal() {
     switchScreen('proposalScreen', 'successScreen', 500);
-    var duration = 4000;
-    var end = Date.now() + duration;
-    var colors = ['#e5a872', '#ffffff', '#ffd700'];
-
-    (function frame() {
-        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors, zIndex: 10000 });
-        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors, zIndex: 10000 });
-        if (Date.now() < end) requestAnimationFrame(frame);
-    }());
-
-    setTimeout(() => {
-        confetti({ particleCount: 100, spread: 160, origin: { y: 0.6 }, colors: colors, zIndex: 10000 });
-    }, 800);
+    
+    // Create Starfield Effect
+    const starfield = document.getElementById('starfield');
+    if (starfield) {
+        for (let i = 0; i < 150; i++) {
+            setTimeout(() => {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                
+                // Set CSS variables for animation
+                star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+                star.style.setProperty('--delay', `${Math.random() * 2}s`);
+                star.style.setProperty('--max-opacity', `${Math.random() * 0.7 + 0.3}`);
+                
+                starfield.appendChild(star);
+            }, i * 20); // gradually add stars
+        }
+    }
 }

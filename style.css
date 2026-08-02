@@ -143,7 +143,7 @@ body {
 .cake-container {
     position: relative;
     width: 100%;
-    height: 250px; /* adjusted height */
+    height: 250px;
     display: flex;
     justify-content: center;
     align-items: flex-end;
@@ -276,7 +276,7 @@ body {
     padding: 0 1rem;
 }
 
-/* Scattered Memories for Proposal Background */
+/* Scattered Memories */
 #scatteredMemories {
     position: absolute;
     top: 0;
@@ -306,7 +306,7 @@ body {
 }
 
 .scattered-photo.show {
-    opacity: 0.25; /* Dim so main text is clear */
+    opacity: 0.25;
 }
 
 /* Flowers */
@@ -332,6 +332,33 @@ body {
     0% { transform: scale(0) rotate(0deg); opacity: 0; }
     20% { opacity: 0.4; }
     100% { transform: scale(3) rotate(45deg); opacity: 0; }
+}
+
+/* Starfield Ending */
+#starfield {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #fff, 0 0 20px var(--accent);
+    opacity: 0;
+    animation: twinkle var(--duration) ease-in-out infinite;
+    animation-delay: var(--delay);
+}
+
+@keyframes twinkle {
+    0% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: var(--max-opacity); transform: scale(1.2); }
+    100% { opacity: 0; transform: scale(0.5); }
 }
 
 /* Proposal Content */
