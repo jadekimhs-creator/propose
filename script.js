@@ -1,39 +1,39 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Web Audio API for typing sound
-    let audioCtx;
-    function playTypeSound() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-        
-        const bufferSize = audioCtx.sampleRate * 0.03; // 30ms of noise
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1; // White noise
-        }
-        
-        const noise = audioCtx.createBufferSource();
-        noise.buffer = buffer;
-        
-        const filter = audioCtx.createBiquadFilter();
-        filter.type = 'bandpass';
-        // Randomize frequency slightly for realistic mechanical sound
-        filter.frequency.value = 4000 + Math.random() * 1000; 
-        
-        const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime); // Volume
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
-        
-        noise.connect(filter);
-        filter.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        noise.start();
+let audioCtx;
+function playTypeSound() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+    
+    const bufferSize = audioCtx.sampleRate * 0.03; // 30ms of noise
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1; // White noise
+    }
+    
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    // Randomize frequency slightly for realistic mechanical sound
+    filter.frequency.value = 4000 + Math.random() * 1000; 
+    
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime); // Volume
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
+    
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    noise.start();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
 
     // Generate intro particles
     const introParticles = document.getElementById('introParticles');
@@ -52,11 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
             introParticles.appendChild(p);
         }
     }
+});
 
-    // Typewriter effect for Intro
-    const t1 = "To. 나의 우주인 너에게";
-    const t2 = "수많은 기적들이 모여 완성된 우리의 시간.\n가장 빛나는 오늘, 너를 위해 준비했어.";
-    
+// Typewriter effect for Intro
+const t1 = "To. 나의 우주인 너에게";
+const t2 = "수많은 기적들이 모여 완성된 우리의 시간.\n가장 빛나는 오늘, 너를 위해 준비했어.";
+
+function startCinematicIntro() {
     let i = 0;
     const speed = 160; 
     const el1 = document.getElementById('typewriter1');
@@ -102,7 +104,23 @@ document.addEventListener('DOMContentLoaded', () => {
         
         setTimeout(typeWriter1, 1000);
     }
-});
+}
+
+function beginProposal() {
+    switchScreen('startScreen', 'introScreen', 1000);
+    
+    const bgm = document.getElementById('bgMusic');
+    if(bgm) {
+        bgm.volume = 0.15;
+        bgm.play().catch(e => console.log("BGM play failed", e));
+    }
+    
+    // Play a silent sound to initialize audio context immediately
+    playTypeSound();
+    
+    // Start intro text after transition
+    setTimeout(startCinematicIntro, 1500);
+}
 
 let isBlowing = false;
 
@@ -176,12 +194,7 @@ const memories = [
 ];
 
 async function startApp() {
-    const bgm = document.getElementById('bgMusic');
-    if(bgm) {
-        bgm.volume = 0.15;
-        bgm.play().catch(e => console.log("BGM play failed", e));
-    }
-    runCinematicSequence();
+    // Left intentionally blank if used later, beginProposal handles BGM now.
 }
 
 function runCinematicSequence() {

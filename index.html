@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>우리의 기적, 그리고 뀰이</title>
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@200;300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
@@ -16,8 +16,18 @@
             <source src="assets/bgm.mp3" type="audio/mpeg">
         </audio>
 
+        <!-- Start Screen (Envelope / Tap to Start) -->
+        <section id="startScreen" class="screen active" style="background-color: #000; z-index: 50;">
+            <div class="content" style="text-align: center;">
+                <button class="btn pulse" onclick="beginProposal()" style="padding: 20px 50px; font-size: 1.3rem; letter-spacing: 2px; border-radius: 50px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 0 30px rgba(229,168,114,0.1);">
+                    <i data-feather="mail" style="margin-right: 10px;"></i> 우리의 기적 열어보기
+                </button>
+                <p style="margin-top: 2rem; color: rgba(255,255,255,0.5); font-size: 0.9rem; font-weight: 200;">화면을 터치해 주세요</p>
+            </div>
+        </section>
+
         <!-- Scene 0: Permission & Start -->
-        <section id="introScreen" class="screen active" style="overflow: hidden; background: #000;">
+        <section id="introScreen" class="screen" style="overflow: hidden; background: #000;">
             <!-- Cinematic Background -->
             <div class="intro-bg"></div>
             <!-- Particles Container -->
@@ -28,7 +38,7 @@
                 </h1>
                 <p id="typewriter2" style="font-size: 1.15rem; color: rgba(255,255,255,0.8); margin-bottom: 3.5rem; font-weight: 200; line-height: 1.8; min-height: 60px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
                 </p>
-                <button class="btn" id="startBtn" onclick="startApp()" style="padding: 16px 42px; font-size: 1.15rem; letter-spacing: 2px; opacity: 0; transform: translateY(15px); transition: all 1s ease;">우리의 이야기 열어보기</button>
+                <button class="btn" id="startBtn" onclick="runCinematicSequence()" style="padding: 16px 42px; font-size: 1.15rem; letter-spacing: 2px; opacity: 0; transform: translateY(15px); transition: all 1s ease;">다음으로</button>
             </div>
         </section>
 
@@ -105,7 +115,7 @@
         </section>
     </div>
 
-    <script src="script.js?v=8"></script>
+    <script src="script.js?v=9"></script>
     <script>
         feather.replace();
     </script>
