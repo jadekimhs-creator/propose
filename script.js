@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Typewriter effect
     const t1 = "To. 나의 우주인 너에게";
-    const t2 = "수많은 기적들이 모여 완성된 우리의 시간.<br>가장 빛나는 오늘, 너를 위해 준비했어.";
+    const t2 = "수많은 기적들이 모여 완성된 우리의 시간.\n가장 빛나는 오늘, 너를 위해 준비했어.";
     
     let i = 0;
     const speed = 100;
@@ -45,13 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let j = 0;
         function typeWriter2() {
             if (j < t2.length) {
-                if (t2.slice(j, j + 4) === '<br>') {
+                const char = t2.charAt(j);
+                if (char === '\n') {
                     el2.innerHTML += '<br>';
-                    j += 4;
                 } else {
-                    el2.innerHTML += t2.charAt(j);
-                    j++;
+                    el2.innerHTML += char;
                 }
+                j++;
                 setTimeout(typeWriter2, speed - 40);
             } else {
                 el2.classList.remove('typing-cursor');
