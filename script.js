@@ -23,8 +23,8 @@ function playTypeSound() {
     filter.frequency.value = 4000 + Math.random() * 1000; 
     
     const gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(0.15, audioCtx.currentTime); // Volume
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
+    gain.gain.setValueAtTime(0.04, audioCtx.currentTime); // Volume lowered
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
     
     noise.connect(filter);
     filter.connect(gain);
@@ -158,6 +158,7 @@ function typeText(element, speed, onComplete) {
                 j++;
             } else {
                 element.innerHTML += char;
+                if (char !== ' ') playTypeSound();
                 j++;
             }
             setTimeout(type, speed);
