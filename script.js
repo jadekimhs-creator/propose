@@ -1,10 +1,4 @@
-let audioContext;
-let analyser;
-let microphone;
-let dataArray;
 let isBlowing = false;
-let blowDuration = 0;
-let animationId;
 
 function switchScreen(fromId, toId, delay = 1500) {
     const fromEl = document.getElementById(fromId);
@@ -30,25 +24,11 @@ async function startApp() {
         bgm.volume = 0.25;
         bgm.play().catch(e => console.log("BGM play failed", e));
     }
-
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioContext.createAnalyser();
-        microphone = audioContext.createMediaStreamSource(stream);
-        microphone.connect(analyser);
-        analyser.fftSize = 256;
-        const bufferLength = analyser.frequencyBinCount;
-        dataArray = new Uint8Array(bufferLength);
-        
-        runCinematicSequence();
-    } catch (err) {
-        alert("마이크 권한이 거부되었거나 지원하지 않는 기기입니다. 촛불을 터치해서 진행할 수 있습니다!");
-        runCinematicSequence(false);
-    }
+    // 스탠바이미 환경을 위해 마이크 권한 요청 제거, 바로 시네마틱 모드 시작
+    runCinematicSequence();
 }
 
-function runCinematicSequence(micEnabled = true) {
+function runCinematicSequence() {
     switchScreen('introScreen', 'prologueScreen', 1000);
     
     setTimeout(() => {
@@ -66,53 +46,17 @@ function runCinematicSequence(micEnabled = true) {
                     
                     setTimeout(() => {
                         switchScreen('prologueScreen', 'cakeScreen', 500);
-                        if (micEnabled) {
-                            setTimeout(checkAudioVolume, 2000);
-                        }
                     }, 2000);
                     
-                }, 4000);
-            }, 2000);
-        }, 4000);
-    }, 2000);
-}
-
-function checkAudioVolume() {
-    if (isBlowing) return; 
-    analyser.getByteFrequencyData(dataArray);
-    
-    let sum = 0;
-    for (let i = 0; i < dataArray.length; i++) {
-        sum += dataArray[i];
-    }
-    let average = sum / dataArray.length;
-    
-    const meterBar = document.getElementById('meterBar');
-    let meterPercentage = Math.min(100, (average / 60) * 100);
-    if (meterBar) meterBar.style.width = meterPercentage + '%';
-    
-    const flame = document.getElementById('flame');
-    if (average > 10) {
-        flame.style.transform = `translateX(-50%) scale(1) rotate(${Math.random() * 30 - 15}deg)`;
-    } else {
-        flame.style.transform = `translateX(-50%) scale(1) rotate(0deg)`;
-    }
-    
-    if (average > 30) { 
-        blowDuration++;
-        if (blowDuration > 5) {
-            blowOutCandle();
-        }
-    } else {
-        blowDuration = 0; 
-    }
-    animationId = requestAnimationFrame(checkAudioVolume);
+                }, 3500); // 프롤로그 시간 단축
+            }, 1000); // 텍스트 간격 단축
+        }, 3500);
+    }, 1500);
 }
 
 function blowOutCandle() {
     if (isBlowing) return;
     isBlowing = true;
-    if (animationId) cancelAnimationFrame(animationId);
     
     const flame = document.getElementById('flame');
     flame.classList.add('blown-out');
@@ -122,10 +66,10 @@ function blowOutCandle() {
         
         setTimeout(() => {
             switchScreen('darkScreen', 'memoryScreen', 500);
-            setTimeout(playMemorySequence, 2000);
-        }, 3000);
+            setTimeout(playMemorySequence, 1500);
+        }, 2000);
         
-    }, 1500);
+    }, 1000);
 }
 
 document.getElementById('candleWrapper').addEventListener('click', () => {
@@ -159,6 +103,7 @@ function playMemorySequence() {
         stepDiv.appendChild(p);
         container.appendChild(stepDiv);
         
+        // 이미지 뜨는 속도 대폭 단축 (6초 -> 3.5초 유지)
         setTimeout(() => {
             stepDiv.classList.add('show');
             setTimeout(() => {
@@ -167,8 +112,8 @@ function playMemorySequence() {
                     stepDiv.remove();
                     currentStep++;
                     showNextMemory();
-                }, 2000);
-            }, 6000); 
+                }, 1000); // 넘어가는 간격 2초 -> 1초
+            }, 3500); // 화면에 머무는 시간 6초 -> 3.5초
         }, 100);
     }
     showNextMemory();
