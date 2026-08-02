@@ -43,14 +43,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         let j = 0;
-        let isHTML = false;
         function typeWriter2() {
             if (j < t2.length) {
-                if (t2.charAt(j) === '<') isHTML = true;
-                el2.innerHTML += t2.charAt(j);
-                if (t2.charAt(j) === '>') isHTML = false;
-                j++;
-                setTimeout(typeWriter2, isHTML ? 0 : speed - 40);
+                if (t2.slice(j, j + 4) === '<br>') {
+                    el2.innerHTML += '<br>';
+                    j += 4;
+                } else {
+                    el2.innerHTML += t2.charAt(j);
+                    j++;
+                }
+                setTimeout(typeWriter2, speed - 40);
             } else {
                 el2.classList.remove('typing-cursor');
                 setTimeout(() => {
