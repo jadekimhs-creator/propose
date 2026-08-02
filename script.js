@@ -18,16 +18,16 @@ function switchScreen(fromId, toId, delay = 1500) {
 // User memory photos and their corresponding cinematic texts
 const memories = [
     { src: 'assets/photo1.jpg', text: '너라는 사람을 만나,<br>나의 세상은 온통 따뜻한 빛이 되었어.' },
-    { src: 'assets/eunbi.jpg', text: '우리의 소중한 첫째 반려묘 <b>은비</b>와 함께해서<br>매일매일이 행복의 연속이었지.' },
-    { src: 'assets/photo2.jpg', text: '그리고 이제는 둘도 셋도 아닌,<br>완전한 <b>넷</b>이 되어 맞이하는 너의 특별한 생일.' },
+    { src: 'assets/gom.jpg', text: '2022년 너의 생일, 함께했던 천사 곰이와 은비.<br>지금쯤 하늘의 가장 밝은 별이 된 곰이도 누구보다 크게 축하해주고 있을 거야.' },
+    { src: 'assets/photo2.jpg', text: '곰이가 보내준 따뜻한 사랑까지 듬뿍 받아,<br>이제는 완전한 가족이 되어 맞이하는 특별한 생일.' },
     { src: 'assets/ggyul.jpg', text: '뀰이와 만난 지 15주 2일차,<br>우리 뀰이와 함께할 찬란한 앞날들이 너무나 기대돼.' },
-    { src: 'assets/photo3.jpg', text: '은비, 뀰이, 그리고 우리 두 사람.<br>내가 언제나 가장 든든한 울타리가 되어 평생 지켜줄게.' }
+    { src: 'assets/photo3.jpg', text: '마음속 영원한 가족 곰이, 은비, 뀰이, 그리고 우리 두 사람.<br>내가 가장 든든한 남편이자 아빠가 되어 평생 지켜줄게.' }
 ];
 
 async function startApp() {
     const bgm = document.getElementById('bgMusic');
     if(bgm) {
-        bgm.volume = 0.25; // 볼륨을 0.5에서 0.25로 절반 줄임
+        bgm.volume = 0.25;
         bgm.play().catch(e => console.log("BGM play failed", e));
     }
 
