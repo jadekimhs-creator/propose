@@ -18,10 +18,10 @@ function switchScreen(fromId, toId, delay = 1500) {
 // User memory photos and their corresponding cinematic texts
 const memories = [
     { src: 'assets/photo1.jpg', text: '너라는 사람을 만나,<br>나의 세상은 온통 따뜻한 빛이 되었어.' },
-    { src: 'assets/photo2.jpg', text: '둘이 아닌 셋이 되어 맞이하는 지금,<br>이 순간이 꿈만 같아.' },
-    // 뀰이 이미지 전용! (ggyul.jpg)
+    { src: 'assets/eunbi.jpg', text: '우리의 소중한 첫째 반려묘 <b>은비</b>와 함께해서<br>매일매일이 행복의 연속이었지.' },
+    { src: 'assets/photo2.jpg', text: '그리고 이제는 둘도 셋도 아닌,<br>완전한 <b>넷</b>이 되어 맞이하는 너의 특별한 생일.' },
     { src: 'assets/ggyul.jpg', text: '뀰이와 만난 지 15주 2일차,<br>우리 뀰이와 함께할 찬란한 앞날들이 너무나 기대돼.' },
-    { src: 'assets/photo3.jpg', text: '때론 힘들어도, 내가 언제나<br>너와 뀰이의 가장 든든한 울타리가 되어줄게.' }
+    { src: 'assets/photo3.jpg', text: '은비, 뀰이, 그리고 우리 두 사람.<br>내가 언제나 가장 든든한 울타리가 되어 평생 지켜줄게.' }
 ];
 
 async function startApp() {
