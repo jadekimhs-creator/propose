@@ -11,7 +11,7 @@ function switchScreen(fromId, toId) {
     document.getElementById(fromId).classList.remove('active');
     setTimeout(() => {
         document.getElementById(toId).classList.add('active');
-    }, 1500); // Wait for fade out
+    }, 1500);
 }
 
 async function startMic() {
@@ -32,96 +32,95 @@ async function startMic() {
         checkAudioVolume();
         
     } catch (err) {
-        alert("마이크 권한이 필요합니다! 권한을 허용하고 다시 시도해주세요.");
-        console.error("Error accessing microphone", err);
+        alert("마이크 권한이 거부되었거나 지원하지 않는 기기입니다. 촛불을 터치해서 진행할 수 있습니다!");
+        switchScreen('introScreen', 'cakeScreen');
     }
 }
 
 function checkAudioVolume() {
-    if (isBlowing) return; // Stop checking if already blown out
+    if (isBlowing) return; 
     
     analyser.getByteFrequencyData(dataArray);
     
-    // Calculate average volume
     let sum = 0;
     for (let i = 0; i < dataArray.length; i++) {
         sum += dataArray[i];
     }
     let average = sum / dataArray.length;
     
-    // Update visual meter
     const meterBar = document.getElementById('meterBar');
-    // Map average (0-128 typically for speech/blow) to percentage
-    let meterPercentage = Math.min(100, (average / 100) * 100);
-    meterBar.style.width = meterPercentage + '%';
+    let meterPercentage = Math.min(100, (average / 60) * 100); // Max out easier
+    if (meterBar) meterBar.style.width = meterPercentage + '%';
     
-    // Make flame react to sound
     const flame = document.getElementById('flame');
     if (average > 10) {
-        flame.style.transform = `translateX(-50%) scale(1) rotate(${Math.random() * 20 - 10}deg)`;
+        flame.style.transform = `translateX(-50%) scale(1) rotate(${Math.random() * 30 - 15}deg)`;
     } else {
         flame.style.transform = `translateX(-50%) scale(1) rotate(0deg)`;
     }
     
-    // Check for "blowing" threshold (loud sustained noise)
-    if (average > 80) { // Adjust threshold based on testing
+    // Lowered threshold significantly for easier blowing
+    if (average > 30) { 
         blowDuration++;
-        if (blowDuration > 15) { // Needs to blow for roughly 15 frames
+        if (blowDuration > 5) { // Needs to blow for very short time
             blowOutCandle();
         }
     } else {
-        blowDuration = 0; // Reset if they stop
+        blowDuration = 0; 
     }
     
     animationId = requestAnimationFrame(checkAudioVolume);
 }
 
 function blowOutCandle() {
+    if (isBlowing) return;
     isBlowing = true;
-    cancelAnimationFrame(animationId);
+    if (animationId) cancelAnimationFrame(animationId);
     
     const flame = document.getElementById('flame');
     flame.classList.add('blown-out');
     
-    // Fade to dark screen after candle goes out
     setTimeout(() => {
         document.getElementById('cakeScreen').classList.remove('active');
         document.getElementById('darkScreen').classList.add('active');
         
-        // Wait a bit in darkness, then show blooming flowers and proposal
         setTimeout(() => {
             document.getElementById('darkScreen').classList.remove('active');
             document.getElementById('proposalScreen').classList.add('active');
             createFlowers();
-        }, 2500);
+        }, 2000);
         
-    }, 1000);
+    }, 1500);
 }
+
+// Fallback: Click the candle to blow it out
+document.getElementById('candleWrapper').addEventListener('click', () => {
+    blowOutCandle();
+});
+
 
 function createFlowers() {
     const container = document.getElementById('flowers');
     
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 20; i++) {
         setTimeout(() => {
             const flower = document.createElement('div');
             flower.classList.add('flower-particle');
             
-            // Random size 100px to 300px
-            const size = Math.random() * 200 + 100;
+            const size = Math.random() * 250 + 100;
             flower.style.width = `${size}px`;
             flower.style.height = `${size}px`;
             
-            // Random position
             flower.style.left = `${Math.random() * 100}vw`;
             flower.style.top = `${Math.random() * 100}vh`;
             
-            // Random color tint
-            const hues = [350, 320, 40, 20]; // Pink, Magenta, Gold, Orange
+            // Elegant elegant gold/white/champagne blooms
+            const hues = [35, 45, 55, 0]; // Warm golds, whites
             const hue = hues[Math.floor(Math.random() * hues.length)];
-            flower.style.background = `radial-gradient(circle, hsla(${hue}, 100%, 75%, 0.8) 0%, transparent 70%)`;
+            flower.style.background = `radial-gradient(circle, hsla(${hue}, 100%, 85%, 0.4) 0%, transparent 60%)`;
             
             container.appendChild(flower);
-        }, i * 150);
+        }, i * 200);
     }
 }
 
@@ -142,13 +141,13 @@ noBtn.addEventListener('touchstart', (e) => {
     moveNoBtn();
 });
 
-// Premium Confetti (Proposal Accepted)
+// Premium Confetti
 function acceptProposal() {
     switchScreen('proposalScreen', 'successScreen');
     
     var duration = 4000;
     var end = Date.now() + duration;
-    var colors = ['#ffb6c1', '#fbc2eb', '#ffffff', '#e5a872']; 
+    var colors = ['#e5a872', '#ffffff', '#ffd700']; // Elegant gold and white
 
     (function frame() {
         confetti({
@@ -175,7 +174,7 @@ function acceptProposal() {
 
     setTimeout(() => {
         confetti({
-            particleCount: 150,
+            particleCount: 100,
             spread: 160,
             origin: { y: 0.6 },
             colors: colors,
