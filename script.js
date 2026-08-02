@@ -27,7 +27,7 @@ const memories = [
 async function startApp() {
     const bgm = document.getElementById('bgMusic');
     if(bgm) {
-        bgm.volume = 0.5;
+        bgm.volume = 0.25; // 볼륨을 0.5에서 0.25로 절반 줄임
         bgm.play().catch(e => console.log("BGM play failed", e));
     }
 
