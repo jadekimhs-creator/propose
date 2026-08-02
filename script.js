@@ -374,6 +374,35 @@ noBtn.addEventListener('mouseover', moveNoBtn);
 noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoBtn(); });
 
 function acceptProposal() {
+    // 1. Cinematic White Flash
+    const flash = document.createElement('div');
+    flash.style.position = 'fixed';
+    flash.style.top = '0'; flash.style.left = '0'; 
+    flash.style.width = '100vw'; flash.style.height = '100vh';
+    flash.style.background = '#fff';
+    flash.style.zIndex = '9999';
+    flash.style.opacity = '1';
+    flash.style.transition = 'opacity 2.5s ease-out';
+    document.body.appendChild(flash);
+    
+    setTimeout(() => { flash.style.opacity = '0'; }, 100);
+    setTimeout(() => { flash.remove(); }, 3000);
+
+    // 2. Emotional Music Swell
+    const bgm = document.getElementById('bgMusic');
+    if (bgm) {
+        let vol = bgm.volume;
+        const swellInterval = setInterval(() => {
+            if (vol < 0.35) {
+                vol += 0.02;
+                bgm.volume = Math.min(vol, 0.35);
+            } else {
+                clearInterval(swellInterval);
+            }
+        }, 300);
+    }
+
+    // 3. Switch Screen
     switchScreen('proposalScreen', 'successScreen', 500);
     
     // Create Starfield Effect
@@ -407,7 +436,26 @@ function acceptProposal() {
         
         setTimeout(() => {
             const elements = document.querySelectorAll('#successScreen .typewriter-element');
-            typeSequence(elements, 160, 900);
+            typeSequence(elements, 160, 900, () => {
+                // 4. Dramatic Confetti after typing finishes!
+                if (window.confetti) {
+                    const duration = 15 * 1000;
+                    const animationEnd = Date.now() + duration;
+                    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+                    
+                    const interval = setInterval(function() {
+                        const timeLeft = animationEnd - Date.now();
+                        if (timeLeft <= 0) return clearInterval(interval);
+                        
+                        const particleCount = 20 * (timeLeft / duration);
+                        confetti(Object.assign({}, defaults, { 
+                            particleCount,
+                            origin: { x: Math.random(), y: Math.random() - 0.2 },
+                            colors: ['#ffffff', '#e5a872', '#ffd700']
+                        }));
+                    }, 250);
+                }
+            });
         }, 1500);
     }, 1000);
 }
