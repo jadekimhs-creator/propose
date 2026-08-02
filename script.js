@@ -1,4 +1,40 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Web Audio API for typing sound
+    let audioCtx;
+    function playTypeSound() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        
+        const bufferSize = audioCtx.sampleRate * 0.03; // 30ms of noise
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1; // White noise
+        }
+        
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+        
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        // Randomize frequency slightly for realistic mechanical sound
+        filter.frequency.value = 4000 + Math.random() * 1000; 
+        
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime); // Volume
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.03);
+        
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        noise.start();
+    }
+
     // Generate intro particles
     const introParticles = document.getElementById('introParticles');
     if (introParticles) {
@@ -33,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function typeWriter1() {
             if (i < t1.length) {
                 el1.innerHTML += t1.charAt(i);
+                if (t1.charAt(i) !== ' ') playTypeSound();
                 i++;
                 setTimeout(typeWriter1, speed);
             } else {
@@ -50,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     el2.innerHTML += '<br>';
                 } else {
                     el2.innerHTML += char;
+                    if (char !== ' ') playTypeSound();
                 }
                 j++;
                 setTimeout(typeWriter2, speed - 30);
