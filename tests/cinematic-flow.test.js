@@ -19,3 +19,13 @@ test('defines five camera variants and the two-second final beat', () => {
   assert.match(script, /const FINAL_SILENT_BEAT_MS = 2000/);
   assert.doesNotMatch(script, /function createFlowers|function moveNoBtn/);
 });
+
+test('styles every camera variant and provides calm responsive motion', () => {
+  const css = fs.readFileSync('style.css', 'utf8');
+
+  for (const variant of ['slow-zoom', 'print', 'pan', 'glow', 'finale']) {
+    assert.match(css, new RegExp(`memory-step--${variant}`));
+  }
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(css, /max-height:\s*52vh/);
+});
