@@ -3,7 +3,7 @@
 :root {
     --bg-color: #050508;
     --text-color: #ffffff;
-    --accent: #e5a872; /* Champagne Gold */
+    --accent: #e5a872;
     --flame-color: #ff9d00;
 }
 
@@ -55,11 +55,12 @@ body {
 .content {
     text-align: center;
     padding: 2rem;
-    z-index: 2;
+    z-index: 5;
     max-width: 600px;
     width: 90%;
 }
 
+/* Base UI styles from previous version */
 .intro-content {
     background: rgba(255, 255, 255, 0.02);
     border-radius: 24px;
@@ -119,22 +120,18 @@ body {
 
 .candle-wrapper {
     position: relative;
-    cursor: pointer; /* Hint that it's clickable */
+    cursor: pointer;
 }
 
-/* The wax part of the candle */
 .candle {
     width: 40px;
     height: 180px;
     background: linear-gradient(to right, #e0e0e0 0%, #ffffff 40%, #ffffff 60%, #e0e0e0 100%);
     border-radius: 6px 6px 3px 3px;
-    box-shadow: 
-        inset 0 -10px 20px rgba(0,0,0,0.1),
-        0 15px 20px rgba(0,0,0,0.4);
+    box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1), 0 15px 20px rgba(0,0,0,0.4);
     position: relative;
 }
 
-/* The wick */
 .candle::before {
     content: '';
     position: absolute;
@@ -156,10 +153,7 @@ body {
     height: 50px;
     background: radial-gradient(ellipse at bottom, #ffffff 10%, #ffdf00 40%, #ff8c00 80%, transparent 100%);
     border-radius: 50% 50% 20% 20%;
-    box-shadow: 
-        0 0 20px var(--flame-color),
-        0 0 50px var(--flame-color),
-        0 0 80px rgba(255, 140, 0, 0.5);
+    box-shadow: 0 0 20px var(--flame-color), 0 0 50px var(--flame-color), 0 0 80px rgba(255, 140, 0, 0.5);
     animation: flicker 2s ease-in-out infinite alternate;
     transform-origin: bottom center;
     transition: all 0.4s ease;
@@ -187,7 +181,6 @@ body {
     font-weight: 300;
 }
 
-/* Audio Meter */
 .audio-meter {
     width: 100px;
     height: 4px;
@@ -204,8 +197,8 @@ body {
     transition: width 0.1s;
 }
 
-/* Proposal Screen */
-#flowers {
+/* Proposal Screen & Flowers */
+#flowers, #memories {
     position: absolute;
     top: 0;
     left: 0;
@@ -227,6 +220,29 @@ body {
     0% { transform: scale(0) rotate(0deg); opacity: 0; }
     20% { opacity: 0.5; }
     100% { transform: scale(2.5) rotate(45deg); opacity: 0; }
+}
+
+/* Polaroid Memories */
+.memory-photo {
+    position: absolute;
+    background: #fff;
+    padding: 10px 10px 40px 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border-radius: 2px;
+    opacity: 0;
+    transform: scale(0.8) rotate(0deg);
+    transition: opacity 2s ease, transform 4s ease-out;
+}
+
+.memory-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #eee;
+}
+
+.memory-photo.show {
+    opacity: 0.4; /* Slightly transparent so text is readable */
 }
 
 .proposal-content {
@@ -255,7 +271,6 @@ body {
     position: relative;
 }
 
-/* Animations */
 .fade-in {
     opacity: 0;
     transform: translateY(15px);

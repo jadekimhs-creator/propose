@@ -14,7 +14,22 @@ function switchScreen(fromId, toId) {
     }, 1500);
 }
 
-async function startMic() {
+// User images config (can be updated by user)
+const memoryImages = [
+    'assets/photo1.jpg',
+    'assets/photo2.jpg',
+    'assets/photo3.jpg',
+    'assets/photo4.jpg'
+];
+
+async function startApp() {
+    // Attempt to play BGM
+    const bgm = document.getElementById('bgMusic');
+    if(bgm) {
+        bgm.volume = 0.5;
+        bgm.play().catch(e => console.log("BGM play failed (maybe no file yet)", e));
+    }
+
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
         
@@ -49,7 +64,7 @@ function checkAudioVolume() {
     let average = sum / dataArray.length;
     
     const meterBar = document.getElementById('meterBar');
-    let meterPercentage = Math.min(100, (average / 60) * 100); // Max out easier
+    let meterPercentage = Math.min(100, (average / 60) * 100);
     if (meterBar) meterBar.style.width = meterPercentage + '%';
     
     const flame = document.getElementById('flame');
@@ -59,10 +74,9 @@ function checkAudioVolume() {
         flame.style.transform = `translateX(-50%) scale(1) rotate(0deg)`;
     }
     
-    // Lowered threshold significantly for easier blowing
     if (average > 30) { 
         blowDuration++;
-        if (blowDuration > 5) { // Needs to blow for very short time
+        if (blowDuration > 5) {
             blowOutCandle();
         }
     } else {
@@ -88,6 +102,7 @@ function blowOutCandle() {
             document.getElementById('darkScreen').classList.remove('active');
             document.getElementById('proposalScreen').classList.add('active');
             createFlowers();
+            createMemories(); // Scatter memory photos
         }, 2000);
         
     }, 1500);
@@ -101,7 +116,6 @@ document.getElementById('candleWrapper').addEventListener('click', () => {
 
 function createFlowers() {
     const container = document.getElementById('flowers');
-    
     for (let i = 0; i < 20; i++) {
         setTimeout(() => {
             const flower = document.createElement('div');
@@ -114,14 +128,54 @@ function createFlowers() {
             flower.style.left = `${Math.random() * 100}vw`;
             flower.style.top = `${Math.random() * 100}vh`;
             
-            // Elegant elegant gold/white/champagne blooms
-            const hues = [35, 45, 55, 0]; // Warm golds, whites
+            const hues = [35, 45, 55, 0];
             const hue = hues[Math.floor(Math.random() * hues.length)];
             flower.style.background = `radial-gradient(circle, hsla(${hue}, 100%, 85%, 0.4) 0%, transparent 60%)`;
             
             container.appendChild(flower);
         }, i * 200);
     }
+}
+
+function createMemories() {
+    const container = document.getElementById('memories');
+    
+    memoryImages.forEach((src, index) => {
+        setTimeout(() => {
+            const polaroid = document.createElement('div');
+            polaroid.classList.add('memory-photo');
+            
+            // Random positioning around the screen
+            const isLeft = Math.random() > 0.5;
+            const x = isLeft ? Math.random() * 20 : 60 + Math.random() * 20; // 0-20vw or 60-80vw
+            const y = Math.random() * 60 + 10; // 10-70vh
+            const rotation = Math.random() * 40 - 20; // -20 to 20 deg
+            
+            polaroid.style.left = `${x}vw`;
+            polaroid.style.top = `${y}vh`;
+            
+            // Image setup
+            const img = document.createElement('img');
+            img.src = src;
+            
+            // If image fails to load (user didn't add it yet), hide it or show placeholder
+            img.onerror = () => { polaroid.style.display = 'none'; };
+            
+            // Polaroid sizing
+            polaroid.style.width = `${Math.random() * 100 + 150}px`; // 150-250px
+            polaroid.style.height = `${parseFloat(polaroid.style.width) * 1.2}px`;
+            
+            polaroid.appendChild(img);
+            container.appendChild(polaroid);
+            
+            // Trigger animation
+            setTimeout(() => {
+                polaroid.classList.add('show');
+                polaroid.style.transform = `scale(1) rotate(${rotation}deg)`;
+            }, 50);
+            
+        }, index * 800); // Stagger appearance
+    });
 }
 
 // "No" button escaping logic
@@ -147,7 +201,7 @@ function acceptProposal() {
     
     var duration = 4000;
     var end = Date.now() + duration;
-    var colors = ['#e5a872', '#ffffff', '#ffd700']; // Elegant gold and white
+    var colors = ['#e5a872', '#ffffff', '#ffd700'];
 
     (function frame() {
         confetti({
