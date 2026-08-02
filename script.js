@@ -17,12 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Typewriter effect
+    // Typewriter effect for Intro
     const t1 = "To. 나의 우주인 너에게";
     const t2 = "수많은 기적들이 모여 완성된 우리의 시간.\n가장 빛나는 오늘, 너를 위해 준비했어.";
     
     let i = 0;
-    const speed = 100;
+    const speed = 80;
     const el1 = document.getElementById('typewriter1');
     const el2 = document.getElementById('typewriter2');
     const startBtn = document.getElementById('startBtn');
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     el2.innerHTML += char;
                 }
                 j++;
-                setTimeout(typeWriter2, speed - 40);
+                setTimeout(typeWriter2, speed - 20);
             } else {
                 el2.classList.remove('typing-cursor');
                 setTimeout(() => {
@@ -71,19 +71,70 @@ let isBlowing = false;
 function switchScreen(fromId, toId, delay = 1500) {
     const fromEl = document.getElementById(fromId);
     const toEl = document.getElementById(toId);
+    
     if(fromEl) fromEl.classList.remove('active');
     setTimeout(() => {
         if(toEl) toEl.classList.add('active');
     }, delay);
 }
 
+// Global Typewriter Engine
+function typeText(element, speed, onComplete) {
+    const text = element.getAttribute('data-text');
+    if (!text) {
+        if (onComplete) onComplete();
+        return;
+    }
+    
+    element.innerHTML = '';
+    element.classList.add('typing-cursor');
+    let j = 0;
+    
+    function type() {
+        if (j < text.length) {
+            const char = text.charAt(j);
+            // Handle both literal '\n' characters from HTML attributes and actual newlines
+            if (char === '\\' && text.charAt(j+1) === 'n') {
+                element.innerHTML += '<br>';
+                j += 2;
+            } else if (char === '\n') {
+                element.innerHTML += '<br>';
+                j++;
+            } else {
+                element.innerHTML += char;
+                j++;
+            }
+            setTimeout(type, speed);
+        } else {
+            element.classList.remove('typing-cursor');
+            if (onComplete) onComplete();
+        }
+    }
+    type();
+}
+
+function typeSequence(elements, speed, delayBetween, onComplete) {
+    let index = 0;
+    function next() {
+        if (index < elements.length) {
+            typeText(elements[index], speed, () => {
+                index++;
+                setTimeout(next, delayBetween);
+            });
+        } else {
+            if (onComplete) onComplete();
+        }
+    }
+    next();
+}
+
 // User memory photos and their corresponding cinematic texts
 const memories = [
-    { src: 'assets/photo1.jpg', text: '너라는 사람을 만나,<br>나의 세상은 온통 따뜻한 빛이 되었어.' },
-    { src: 'assets/gom.jpg', text: '2022년 너의 생일, 함께했던 천사 곰이와 은비.<br>지금쯤 하늘의 가장 밝은 별이 된 곰이도 누구보다 크게 축하해주고 있을 거야.' },
-    { src: 'assets/photo2.jpg', text: '곰이가 보내준 따뜻한 사랑까지 듬뿍 받아,<br>이제는 완전한 가족이 되어 맞이하는 특별한 생일.' },
-    { src: 'assets/ggyul.jpg', text: '뀰이와 만난 지 15주 2일차,<br>우리 뀰이와 함께할 찬란한 앞날들이 너무나 기대돼.' },
-    { src: 'assets/photo3.jpg', text: '마음속 영원한 가족 곰이, 은비, 뀰이, 그리고 우리 두 사람.<br>내가 가장 든든한 남편이자 아빠가 되어 평생 지켜줄게.' }
+    { src: 'assets/photo1.jpg', text: '바라던 사람을 만나,\n나의 세상은 온통 따뜻한 빛이 되었어.' },
+    { src: 'assets/gom.jpg', text: '2022년 너의 생일, 함께했던 천사 곰이도 있지?\n지금쯤 하늘의 가장 밝은 별이 된 곰이가 누구보다 크게 축하해주고 있을 거야.' },
+    { src: 'assets/photo2.jpg', text: '곰이가 보내준 따뜻한 사랑까지 듬뿍 받아,\n이제는 완전한 가족이 되어 맞이하는 특별한 생일.' },
+    { src: 'assets/ggyul.jpg', text: '뀰이를 만난 지 15주 2일차,\n우리 셋이서 함께할 찬란한 나날들이 너무도 기대돼.' },
+    { src: 'assets/photo3.jpg', text: '마음의 응원을 가득 곰이, 뱃속 뀰이, 그리고 우리 두 사람.\n내가 가장 든든한 남편이자 아빠가 되어 평생 지켜줄게.' }
 ];
 
 async function startApp() {
@@ -92,7 +143,6 @@ async function startApp() {
         bgm.volume = 0.25;
         bgm.play().catch(e => console.log("BGM play failed", e));
     }
-    // 스탠바이미 환경을 위해 마이크 권한 요청 제거, 바로 시네마틱 모드 시작
     runCinematicSequence();
 }
 
@@ -100,26 +150,25 @@ function runCinematicSequence() {
     switchScreen('introScreen', 'prologueScreen', 1000);
     
     setTimeout(() => {
-        const text1 = document.getElementById('prologueText1');
-        text1.classList.add('show');
-        
-        setTimeout(() => {
-            text1.classList.remove('show');
+        const elements = document.querySelectorAll('#prologueScreen .typewriter-element');
+        typeSequence(elements, 70, 800, () => {
             setTimeout(() => {
-                const text2 = document.getElementById('prologueText2');
-                text2.classList.add('show');
-                
-                setTimeout(() => {
-                    text2.classList.remove('show');
-                    
-                    setTimeout(() => {
-                        switchScreen('prologueScreen', 'cakeScreen', 500);
-                    }, 2000);
-                    
-                }, 3500); // 프롤로그 시간 단축
-            }, 1000); // 텍스트 간격 단축
-        }, 3500);
+                switchScreen('prologueScreen', 'cakeScreen', 1000);
+                startCakeScene();
+            }, 2000);
+        });
     }, 1500);
+}
+
+function startCakeScene() {
+    setTimeout(() => {
+        const elements = document.querySelectorAll('#cakeScreen .typewriter-element');
+        const cakeVisual = document.getElementById('cakeVisual');
+        
+        typeSequence(elements, 60, 500, () => {
+            cakeVisual.style.opacity = '1';
+        });
+    }, 1000);
 }
 
 function blowOutCandle() {
@@ -153,6 +202,7 @@ function playMemorySequence() {
             switchScreen('memoryScreen', 'proposalScreen', 1500);
             createFlowers();
             scatterMemoriesBackground();
+            startProposalScene();
             return;
         }
         
@@ -165,23 +215,28 @@ function playMemorySequence() {
         img.onerror = () => { img.style.display = 'none'; };
         
         const p = document.createElement('p');
-        p.innerHTML = mem.text;
+        p.className = 'typewriter-element';
+        p.setAttribute('data-text', mem.text);
         
         stepDiv.appendChild(img);
         stepDiv.appendChild(p);
         container.appendChild(stepDiv);
         
-        // 이미지 뜨는 속도 대폭 단축 (6초 -> 3.5초 유지)
         setTimeout(() => {
             stepDiv.classList.add('show');
             setTimeout(() => {
-                stepDiv.classList.remove('show');
-                setTimeout(() => {
-                    stepDiv.remove();
-                    currentStep++;
-                    showNextMemory();
-                }, 1000); // 넘어가는 간격 2초 -> 1초
-            }, 3500); // 화면에 머무는 시간 6초 -> 3.5초
+                // Type fast for memories
+                typeText(p, 35, () => {
+                    setTimeout(() => {
+                        stepDiv.classList.remove('show');
+                        setTimeout(() => {
+                            stepDiv.remove();
+                            currentStep++;
+                            showNextMemory();
+                        }, 1000); 
+                    }, 2500); 
+                });
+            }, 500);
         }, 100);
     }
     showNextMemory();
@@ -243,6 +298,18 @@ function scatterMemoriesBackground() {
     });
 }
 
+function startProposalScene() {
+    setTimeout(() => {
+        const elements = document.querySelectorAll('#proposalScreen .typewriter-element');
+        const btns = document.getElementById('proposalBtns');
+        
+        typeSequence(elements, 60, 600, () => {
+            btns.style.opacity = '1';
+            btns.style.transform = 'translateY(0)';
+        });
+    }, 1500);
+}
+
 const noBtn = document.getElementById('noBtn');
 function moveNoBtn() {
     noBtn.style.position = 'fixed';
@@ -272,13 +339,23 @@ function acceptProposal() {
                 star.style.left = `${Math.random() * 100}vw`;
                 star.style.top = `${Math.random() * 100}vh`;
                 
-                // Set CSS variables for animation
                 star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
                 star.style.setProperty('--delay', `${Math.random() * 2}s`);
                 star.style.setProperty('--max-opacity', `${Math.random() * 0.7 + 0.3}`);
                 
                 starfield.appendChild(star);
-            }, i * 20); // gradually add stars
+            }, i * 20);
         }
     }
+    
+    setTimeout(() => {
+        const line = document.getElementById('successLine');
+        line.style.opacity = '0.8';
+        line.style.height = '60px';
+        
+        setTimeout(() => {
+            const elements = document.querySelectorAll('#successScreen .typewriter-element');
+            typeSequence(elements, 70, 700);
+        }, 1500);
+    }, 1000);
 }

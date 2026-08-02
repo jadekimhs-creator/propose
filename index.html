@@ -35,26 +35,26 @@
         <!-- Scene 1: Prologue (Black screen, text fades in and out) -->
         <section id="prologueScreen" class="screen" style="background-color: #000;">
             <div class="content prologue-content">
-                <h2 id="prologueText1" class="cinematic-text">우리가 서로를 알아보고, 사랑에 빠지고...</h2>
-                <h2 id="prologueText2" class="cinematic-text">함께하는 매 순간이 기적 같았던 날들.</h2>
+                <h2 id="prologueText1" class="cinematic-text typewriter-element" data-text="우리가 서로를 알아보고, 사랑에 빠지고..."></h2>
+                <h2 id="prologueText2" class="cinematic-text typewriter-element" data-text="함께하는 매 순간이 기적 같았던 날들."></h2>
             </div>
         </section>
 
         <!-- Scene 2: The Candle -->
         <section id="cakeScreen" class="screen">
             <div class="content cake-content">
-                <h2 class="fade-in cinematic-text-small" style="margin-bottom: 1rem;">오늘은 세상에서 가장 특별한 너의 생일.</h2>
-                <h2 class="fade-in delay-1 cinematic-text-small" style="margin-bottom: 1rem;">우리에게 찾아온 천사 <strong>'뀰이'</strong>와 함께 맞이하는 첫 생일이네.</h2>
-                <h2 class="fade-in delay-2 cinematic-text-small" style="margin-bottom: 3rem; color: var(--accent);">우리의 더 찬란한 내일을 위해,<br>소원을 빌고 촛불을 꺼줄래?</h2>
+                <h2 class="cinematic-text-small typewriter-element" data-text="오늘은 세상에서 가장 특별한 너의 생일." style="margin-bottom: 1rem; min-height: 1.5em;"></h2>
+                <h2 class="cinematic-text-small typewriter-element" data-text="우리에게 찾아온 천사 '뀰이'와 함께 맞이하는 첫 생일이네." style="margin-bottom: 1rem; min-height: 1.5em;"></h2>
+                <h2 class="cinematic-text-small typewriter-element" data-text="우리의 더 찬란한 내일을 위해,\n소원을 빌고 촛불을 꺼줄래?" style="margin-bottom: 3rem; color: var(--accent); min-height: 3em;"></h2>
                 
-                <div class="cake-container fade-in delay-3">
+                <div class="cake-container" style="opacity: 0; transition: opacity 1s ease;" id="cakeVisual">
                     <div class="candle-wrapper" id="candleWrapper">
                         <div class="candle"></div>
                         <div id="flame" class="flame"></div>
                     </div>
                 </div>
                 
-                <p class="hint-text fade-in delay-4" style="font-size: 1.1rem; color: rgba(255,255,255,0.7);">촛불을 살짝 터치해서 꺼주세요</p>
+                <p class="hint-text typewriter-element" data-text="촛불을 살짝 터치해서 꺼주세요" style="font-size: 1.1rem; color: rgba(255,255,255,0.7); min-height: 1.5em;"></p>
             </div>
         </section>
 
@@ -75,11 +75,11 @@
             <div id="scatteredMemories"></div>
             
             <div class="content proposal-content">
-                <h1 class="fade-in" style="font-weight: 200; font-size: 1.35rem; line-height: 1.5; color: rgba(255,255,255,0.9); margin-bottom: 1rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">나의 우주이자 내 삶의 전부인 너에게.</h1>
-                <h1 class="fade-in delay-1" style="font-weight: 200; font-size: 1.35rem; line-height: 1.6; color: rgba(255,255,255,0.9); margin-bottom: 2.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">너의 남편, 뀰이의 아빠, 은비의 든든한 보호자로서<br>평생 너희들의 큰 나무가 되어 비바람을 막아줄게.</h1>
-                <h1 class="fade-in delay-2" style="font-size: 2.8rem; font-weight: 500; margin-bottom: 3.5rem; letter-spacing: -1px; text-shadow: 0 4px 20px rgba(0,0,0,0.9); color: var(--accent);">나와 결혼해 줄래? 💍</h1>
+                <h1 class="typewriter-element" data-text="나의 우주이자 내 삶의 전부인 너에게." style="font-weight: 200; font-size: 1.35rem; line-height: 1.5; color: rgba(255,255,255,0.9); margin-bottom: 1rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8); min-height: 1.5em;"></h1>
+                <h1 class="typewriter-element" data-text="너의 남편, 뀰이의 아빠, 은비의 든든한 보호자로서\n평생 너희들의 큰 나무가 되어 비바람을 막아줄게." style="font-weight: 200; font-size: 1.35rem; line-height: 1.6; color: rgba(255,255,255,0.9); margin-bottom: 2.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.8); min-height: 3.2em;"></h1>
+                <h1 class="typewriter-element" data-text="나와 결혼해 줄래? 💍" style="font-size: 2.8rem; font-weight: 500; margin-bottom: 3.5rem; letter-spacing: -1px; text-shadow: 0 4px 20px rgba(0,0,0,0.9); color: var(--accent); min-height: 1.5em;"></h1>
                 
-                <div class="button-group fade-in delay-3">
+                <div class="button-group" style="opacity: 0; transform: translateY(15px); transition: all 1s ease;" id="proposalBtns">
                     <button class="btn yes-btn" onclick="acceptProposal()">Yes</button>
                     <button class="btn no-btn" id="noBtn">No</button>
                 </div>
@@ -92,31 +92,20 @@
             <div id="starfield"></div>
             
             <div class="content" style="z-index: 10;">
-                <div class="fade-in" style="width: 2px; height: 60px; background: linear-gradient(to bottom, transparent, var(--accent), transparent); margin: 0 auto 2rem auto; opacity: 0.8;"></div>
+                <div id="successLine" style="width: 2px; height: 0px; background: linear-gradient(to bottom, transparent, var(--accent), transparent); margin: 0 auto 2rem auto; opacity: 0; transition: all 1.5s ease;"></div>
                 
-                <h1 class="fade-in delay-1" style="font-size: 2.2rem; font-weight: 200; line-height: 1.5; color: rgba(255,255,255,0.95); margin-bottom: 2.5rem; text-shadow: 0 0 20px rgba(229,168,114,0.3);">
-                    나의 가장 눈부신 대답이 되어주어 고마워.
-                </h1>
+                <h1 class="typewriter-element" data-text="나의 가장 눈부신 대답이 되어주어 고마워." style="font-size: 2.2rem; font-weight: 200; line-height: 1.5; color: rgba(255,255,255,0.95); margin-bottom: 2.5rem; text-shadow: 0 0 20px rgba(229,168,114,0.3); min-height: 1.5em;"></h1>
                 
-                <p class="fade-in delay-2" style="font-size: 1.15rem; font-weight: 200; color: rgba(255,255,255,0.7); margin-bottom: 3rem; line-height: 1.8;">
-                    우리가 걸어온 모든 어제와,<br>
-                    앞으로 마주할 수많은 내일들이<br>
-                    저 별빛처럼 영원히 찬란하도록 지켜줄게.
-                </p>
+                <p class="typewriter-element" data-text="우리가 걸어온 모든 어제와,\n앞으로 마주할 수많은 내일들이\n저 별빛처럼 영원히 찬란하도록 지켜줄게." style="font-size: 1.15rem; font-weight: 200; color: rgba(255,255,255,0.7); margin-bottom: 3rem; line-height: 1.8; min-height: 5.4em;"></p>
 
-                <p class="fade-in delay-3" style="font-size: 1.3rem; font-weight: 200; color: rgba(255,255,255,0.9); margin-bottom: 3.5rem; line-height: 1.6;">
-                    이제 화면 속 이야기는 여기서 끝나지만,<br>
-                    우리의 진짜 기적은 지금부터 시작이야.
-                </p>
+                <p class="typewriter-element" data-text="이제 화면 속 이야기는 여기서 끝나지만,\n우리의 진짜 기적은 지금부터 시작이야." style="font-size: 1.3rem; font-weight: 200; color: rgba(255,255,255,0.9); margin-bottom: 3.5rem; line-height: 1.6; min-height: 3.2em;"></p>
 
-                <p class="fade-in delay-4" style="font-size: 1.7rem; font-weight: 400; color: var(--accent); letter-spacing: 2px; text-shadow: 0 0 15px rgba(229,168,114,0.6);">
-                    고개를 들어 나를 바라봐줄래? 💐
-                </p>
+                <p class="typewriter-element" data-text="고개를 들어 나를 바라봐줄래? 💐" style="font-size: 1.7rem; font-weight: 400; color: var(--accent); letter-spacing: 2px; text-shadow: 0 0 15px rgba(229,168,114,0.6); min-height: 1.5em;"></p>
             </div>
         </section>
     </div>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=3"></script>
     <script>
         feather.replace();
     </script>
