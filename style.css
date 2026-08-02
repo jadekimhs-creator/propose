@@ -245,11 +245,15 @@ body {
     flex-direction: column;
     align-items: center;
     opacity: 0;
-    transition: opacity 2s ease;
+    transform: scale(1.05) translateY(15px);
+    filter: blur(10px);
+    transition: opacity 2s ease-in-out, transform 8s ease-out, filter 2s ease-in-out;
 }
 
 .memory-step.show {
     opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
 }
 
 .memory-step img {
