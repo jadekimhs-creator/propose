@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>우리의 기적, 그리고 뀰이</title>
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=17">
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@200;300;400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
@@ -32,33 +32,25 @@
             <div class="intro-bg"></div>
             <!-- Particles Container -->
             <div id="introParticles"></div>
-    <!-- Play Context Screen (Fix for Audio Policy) -->
-    <div id="startScreen">
-        <div class="envelope">
-            <i data-feather="mail" class="envelope-icon"></i>
-            <p>From. 뀰이 아빠</p>
-            <p style="font-size: 1rem; opacity: 0.6; margin-top: 1rem;">봉투를 열어주세요</p>
-        </div>
-    </div>
-
-    <div class="container">
-        <!-- Intro Screen -->
-        <section id="introScreen" class="screen active">
-            <div class="content">
-                <h1 class="typewriter-element intro-title" data-text="나의 마지막 사랑 다운천사 공주님" style="font-weight: 200; margin-bottom: 2rem;"></h1>
-                <p class="typewriter-element cinematic-text" data-text="수많은 기적들이 모여 완성된 우리의 시간.\n가장 빛나는 오늘, 너를 위해 준비했어." style="color: rgba(255,255,255,0.8);"></p>
+            
+            <div class="content intro-content" style="padding: 5rem 3rem; z-index: 10; background: transparent; border: none; box-shadow: none; backdrop-filter: none;">
+                <h1 id="typewriter1" style="font-size: 2.2rem; font-weight: 200; margin-bottom: 1.5rem; color: rgba(255,255,255,0.95); letter-spacing: 1px; min-height: 40px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
+                </h1>
+                <p id="typewriter2" style="font-size: 1.15rem; color: rgba(255,255,255,0.8); margin-bottom: 3.5rem; font-weight: 200; line-height: 1.8; min-height: 60px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
+                </p>
+                <button class="btn" id="startBtn" onclick="runCinematicSequence()" style="padding: 16px 42px; font-size: 1.15rem; letter-spacing: 2px; opacity: 0; transform: translateY(15px); transition: all 1s ease;">다음으로</button>
             </div>
         </section>
 
-        <!-- Video/Prologue Screen (Optional context) -->
-        <section id="prologueScreen" class="screen">
+        <!-- Scene 1: Prologue (Black screen, text fades in and out) -->
+        <section id="prologueScreen" class="screen" style="background-color: #000;">
             <div class="content prologue-content">
-                <h2 class="typewriter-element cinematic-text" data-text="우리가 처음 만났던 날을 기억해?"></h2>
-                <h2 class="typewriter-element cinematic-text" data-text="그날 이후, 내 모든 시간은\n너를 향해 흐르고 있어." style="margin-top: 2rem;"></h2>
+                <h2 id="prologueText1" class="cinematic-text typewriter-element" data-text="우리가 서로를 알아보고, 사랑에 빠지고..."></h2>
+                <h2 id="prologueText2" class="cinematic-text typewriter-element" data-text="함께하는 매 순간이 기적 같았던 날들."></h2>
             </div>
         </section>
 
-        <!-- Cake Screen -->
+        <!-- Scene 2: The Candle -->
         <section id="cakeScreen" class="screen">
             <div class="content cake-content">
                 <h2 class="cinematic-text-small typewriter-element" data-text="오늘은 세상에서 가장 특별한 너의 생일." style="margin-bottom: 1rem; min-height: 1.5em;"></h2>
@@ -66,27 +58,30 @@
                 <h2 class="cinematic-text-small typewriter-element" data-text="우리의 더 찬란한 내일을 위해,\n소원을 빌고 촛불을 꺼줄래?" style="margin-bottom: 3rem; color: var(--accent); min-height: 3em;"></h2>
                 
                 <div class="cake-container" style="opacity: 0; transition: opacity 1s ease;" id="cakeVisual">
-                    <div class="candle" id="candleWrapper">
-                        <div class="flame" id="flame"></div>
+                    <div class="candle-wrapper" id="candleWrapper">
+                        <div class="candle"></div>
+                        <div id="flame" class="flame"></div>
                     </div>
-                    <p class="hint-text glow-pulse" style="margin-top: 3rem;">(촛불을 터치해서 꺼주세요)</p>
                 </div>
+                
+                <p class="hint-text typewriter-element" data-text="촛불을 살짝 터치해서 꺼주세요" style="font-size: 1.1rem; color: rgba(255,255,255,0.7); min-height: 1.5em;"></p>
             </div>
         </section>
-        
-        <!-- Dark Screen for transition -->
-        <section id="darkScreen" class="screen" style="background: #000; transition: opacity 2s ease;">
+
+        <!-- Darkness Transition Screen -->
+        <section id="darkScreen" class="screen" style="background: #000; transition: background 2s;">
         </section>
 
-        <!-- Memories Screen (Sequential) -->
-        <section id="memoryScreen" class="screen" style="background: #000;">
+        <!-- Scene 3: The Memories (Sequenced Photos) -->
+        <section id="memoryScreen" class="screen" style="background: #050508;">
             <div id="memoryContainer" class="memory-container">
-                <!-- Memory steps injected here -->
             </div>
         </section>
 
-        <!-- Proposal Screen (Climax) -->
+        <!-- Scene 4: Proposal Climax -->
         <section id="proposalScreen" class="screen">
+            <div id="flowers"></div>
+            <!-- Background scattered photos -->
             <div id="scatteredMemories"></div>
             
             <div class="content proposal-content">
@@ -95,13 +90,10 @@
                 <h1 class="typewriter-element" data-text="나와 결혼해 줄래? 💍" style="font-size: 2.8rem; font-weight: 500; margin-bottom: 3.5rem; letter-spacing: -1px; text-shadow: 0 4px 20px rgba(0,0,0,0.9); color: var(--accent); min-height: 1.5em;"></h1>
                 
                 <div class="button-group" style="opacity: 0; transform: translateY(15px); transition: all 1s ease;" id="proposalBtns">
-                    <button class="btn btn-yes" onclick="acceptProposal()">Yes</button>
-                    <button class="btn btn-no" onclick="runAway(this)" onmouseover="runAway(this)">No</button>
+                    <button class="btn yes-btn" onclick="acceptProposal()">Yes</button>
+                    <button class="btn no-btn" id="noBtn">No</button>
                 </div>
             </div>
-            
-            <!-- White flash overlay -->
-            <div id="flash" style="position: absolute; top:0; left:0; width:100%; height:100%; background:#fff; z-index:999; opacity:0; pointer-events:none; transition: opacity 0.8s ease;"></div>
         </section>
 
         <!-- Success Screen -->
@@ -123,7 +115,7 @@
         </section>
     </div>
 
-    <script src="script.js?v=15"></script>
+    <script src="script.js?v=17"></script>
     <script>
         feather.replace();
     </script>
