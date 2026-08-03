@@ -438,24 +438,12 @@ function playMemorySequence() {
                                 // Show secret touching message from Gomi
                                 seqTimeout(() => {
                                     const secretMessage = document.createElement('div');
-                                    secretMessage.innerHTML = '"고마워 엄마, 평생 행복해야 해!"';
-                                    secretMessage.style.position = 'absolute';
-                                    secretMessage.style.top = '50%';
-                                    secretMessage.style.left = '50%';
-                                    secretMessage.style.transform = 'translate(-50%, -50%)';
-                                    secretMessage.style.color = '#fff';
-                                    secretMessage.style.fontSize = '2.2rem';
-                                    secretMessage.style.fontWeight = '500';
-                                    secretMessage.style.textShadow = '0 0 30px rgba(255,255,255,1), 0 0 10px #ffdb58';
-                                    secretMessage.style.opacity = '0';
-                                    secretMessage.style.transition = 'opacity 2s ease';
-                                    secretMessage.style.zIndex = '30';
-                                    secretMessage.style.textAlign = 'center';
-                                    secretMessage.style.width = '90vw';
+                                    secretMessage.className = 'secret-gomi-message';
+                                    secretMessage.innerHTML = '"고마워 누나, 평생 행복해야 해!"';
                                     stepDiv.appendChild(secretMessage);
                                     
                                     secretMessage.offsetHeight; // trigger reflow
-                                    secretMessage.style.opacity = '1';
+                                    secretMessage.classList.add('show');
                                     
                                     seqTimeout(() => {
                                         const flash = document.createElement('div');

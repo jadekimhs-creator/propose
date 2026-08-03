@@ -621,3 +621,25 @@ body {
 
 #skipBackOverlay { position: fixed; top: 0; left: 0; width: 35vw; height: 100vh; z-index: 9000; cursor: pointer; display: none; }
 
+
+.secret-gomi-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    text-align: center;
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+    z-index: 30;
+    opacity: 0;
+    transition: opacity 3s ease, transform 3s ease;
+    text-shadow: 0 0 30px rgba(255, 230, 150, 0.8), 0 0 10px rgba(255, 255, 255, 1);
+}
+.secret-gomi-message.show {
+    opacity: 1;
+    transform: translate(-50%, -60%);
+}
+
