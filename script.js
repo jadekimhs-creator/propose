@@ -55,19 +55,31 @@ document.addEventListener('DOMContentLoaded', () => {
 let totalSteps = 14; 
 let currentProgress = 0;
 let globalSkipFn = null;
+let globalSkipBackFn = null;
 let activeSeqTimeouts = [];
 
-function updateProgress() {
-    currentProgress++;
+function updateProgressWidth() {
     const pct = Math.min((currentProgress / totalSteps) * 100, 100);
     const bar = document.getElementById('progressBar');
     if (bar) bar.style.width = pct + '%';
+}
+
+function updateProgress() {
+    currentProgress++;
+    updateProgressWidth();
 }
 
 function skipCurrent() {
     if (globalSkipFn) {
         clearSeqTimeouts();
         globalSkipFn();
+    }
+}
+
+function skipPrevious() {
+    if (globalSkipBackFn) {
+        clearSeqTimeouts();
+        globalSkipBackFn();
     }
 }
 
@@ -126,6 +138,7 @@ function beginProposal() {
     switchScreen('startScreen', 'introScreen', 1000);
     document.getElementById('progressContainer').style.display = 'block';
     document.getElementById('skipOverlay').style.display = 'block';
+    document.getElementById('skipBackOverlay').style.display = 'block';
     
     const bgm = document.getElementById('bgMusic');
     if(bgm) {
@@ -276,10 +289,12 @@ const memories = [
 function playMemorySequence() {
     const container = document.getElementById('memoryContainer');
     let currentStep = 0;
+    let stepDiv = null;
     
-    function showNextMemory() {
+    function showNextMemory(direction = 1) {
         if (currentStep >= memories.length) {
             globalSkipFn = null;
+            globalSkipBackFn = null;
             switchScreen('memoryScreen', 'proposalScreen', 1500);
             createFlowers();
             scatterMemoriesBackground();
@@ -287,10 +302,17 @@ function playMemorySequence() {
             return;
         }
         
-        updateProgress(); // Steps 4 to 12
+        if (direction === 1) {
+            updateProgress(); // Steps 4 to 12
+        } else {
+            currentProgress = Math.max(3, currentProgress - 1); // 3 is Cake
+            updateProgressWidth();
+        }
+        
+        if (stepDiv) stepDiv.remove();
         
         const mem = memories[currentStep];
-        const stepDiv = document.createElement('div');
+        stepDiv = document.createElement('div');
         stepDiv.className = 'memory-step';
         if (mem.effect) stepDiv.classList.add(mem.effect);
         
@@ -317,8 +339,19 @@ function playMemorySequence() {
             setTimeout(() => {
                 stepDiv.remove();
                 currentStep++;
-                showNextMemory();
+                showNextMemory(1);
             }, 600);
+        };
+        
+        globalSkipBackFn = () => {
+            if (currentStep > 0) {
+                stepDiv.classList.remove('show');
+                setTimeout(() => {
+                    stepDiv.remove();
+                    currentStep--;
+                    showNextMemory(-1);
+                }, 300);
+            }
         };
         
         seqTimeout(() => {
@@ -332,14 +365,14 @@ function playMemorySequence() {
                         seqTimeout(() => {
                             stepDiv.remove();
                             currentStep++;
-                            showNextMemory();
+                            showNextMemory(1);
                         }, 1000); 
                     }, 2800); 
                 });
             }, 500);
         }, 100);
     }
-    showNextMemory();
+    showNextMemory(1);
 }
 
 function createFlowers() {
@@ -398,6 +431,7 @@ function scatterMemoriesBackground() {
 function startProposalScene() {
     updateProgress(); // Step 13
     document.getElementById('skipOverlay').style.display = 'none'; // Don't allow skipping proposal buttons
+    document.getElementById('skipBackOverlay').style.display = 'none'; // Disable back
     
     seqTimeout(() => {
         const elements = document.querySelectorAll('#proposalScreen .typewriter-element');
