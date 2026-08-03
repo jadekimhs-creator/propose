@@ -318,28 +318,29 @@ body {
     position: absolute;
     top: -10vh; left: -10vw;
     width: 120vw; height: 120vh;
-    background: radial-gradient(circle at center, rgba(0,0,0,0) 25%, rgba(0,0,0,0.95) 70%);
+    background: radial-gradient(circle at center, rgba(0,0,0,0) 20%, rgba(0,0,0,0.98) 60%);
     z-index: 2;
     pointer-events: none;
     opacity: 0;
-    animation: spotlightIn 2s 0.5s forwards ease-out;
+    animation: spotlightIn 4s 0.5s forwards ease-in-out;
 }
 @keyframes spotlightIn {
     to { opacity: 1; }
 }
 
 .memory-step.show.effect-halo img:not(.memory-bg) {
-    box-shadow: 0 0 80px rgba(255,255,255,0.7);
+    box-shadow: 0 0 100px rgba(255,255,255,0.9);
     object-fit: cover !important;
-    object-position: 35% 55% !important;
-    width: 85vw !important;
-    height: 60vh !important;
-    animation: gomiZoom 10s ease-out forwards;
+    object-position: 45% 25% !important;
+    width: 90vw !important;
+    height: 65vh !important;
+    filter: brightness(1.1) contrast(1.05);
+    animation: gomiZoom 12s ease-out forwards;
 }
 
 @keyframes gomiZoom {
-    0% { transform: scale(1.1); }
-    100% { transform: scale(1.4); }
+    0% { transform: scale(1.0); }
+    100% { transform: scale(1.35); }
 }
 
 .memory-step.show.effect-heartbeat img:not(.memory-bg) {

@@ -321,6 +321,30 @@ function playMemorySequence() {
         bgImg.className = 'memory-bg';
         stepDiv.appendChild(bgImg);
         
+        // Emphasize Gomi with golden stars
+        if (mem.effect === 'effect-halo') {
+            const starsContainer = document.createElement('div');
+            starsContainer.style.position = 'absolute';
+            starsContainer.style.top = '0'; starsContainer.style.left = '0';
+            starsContainer.style.width = '100vw'; starsContainer.style.height = '100vh';
+            starsContainer.style.zIndex = '1';
+            
+            for (let i = 0; i < 40; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                const size = Math.random() * 4 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+                star.style.setProperty('--delay', `${Math.random() * 2}s`);
+                star.style.setProperty('--max-opacity', `${Math.random() * 0.8 + 0.2}`);
+                starsContainer.appendChild(star);
+            }
+            stepDiv.appendChild(starsContainer);
+        }
+        
         const img = document.createElement('img');
         img.src = mem.src;
         img.onerror = () => { img.style.display = 'none'; };
@@ -358,7 +382,8 @@ function playMemorySequence() {
             stepDiv.classList.add('show');
             seqTimeout(() => {
                 p.classList.add('typing-cursor');
-                typeTextRaw(p, mem.text, 90, () => {
+                const typeSpeed = (mem.effect === 'effect-halo') ? 140 : 90; // Slower, dramatic typing for Gomi
+                typeTextRaw(p, mem.text, typeSpeed, () => {
                     p.classList.remove('typing-cursor');
                     seqTimeout(() => {
                         stepDiv.classList.remove('show');
@@ -367,7 +392,7 @@ function playMemorySequence() {
                             currentStep++;
                             showNextMemory(1);
                         }, 1000); 
-                    }, 2800); 
+                    }, (mem.effect === 'effect-halo') ? 4000 : 2800); // Wait longer for Gomi
                 });
             }, 500);
         }, 100);
