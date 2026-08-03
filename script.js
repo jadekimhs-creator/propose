@@ -401,7 +401,8 @@ function playMemorySequence() {
                             
                             const bgm = document.getElementById('bgMusic');
                             if (bgm) {
-                                bgm.pause();
+                                // Lower volume drastically for the quiet moment
+                                bgm.volume = 0.15;
                             }
                             
                             const handleTouch = (e) => {
@@ -409,11 +410,14 @@ function playMemorySequence() {
                                 document.removeEventListener('touchstart', handleTouch);
                                 
                                 if (bgm) {
-                                    bgm.volume = 1.0;
-                                    bgm.play();
+                                    // Resume to a comfortable loud volume (0.7), not deafening 1.0
+                                    bgm.volume = 0.7;
                                 }
                                 
+                                prompt.style.transition = 'opacity 1s ease';
                                 prompt.style.opacity = '0';
+                                p.style.transition = 'opacity 1s ease';
+                                p.style.opacity = '0'; // Fade out original text
                                 
                                 const ripple = document.createElement('div');
                                 ripple.className = 'ripple-effect';
@@ -431,29 +435,52 @@ function playMemorySequence() {
                                 ripple.style.top = `${clientY}px`;
                                 document.body.appendChild(ripple);
                                 
+                                // Show secret touching message from Gomi
                                 seqTimeout(() => {
-                                    const flash = document.createElement('div');
-                                    flash.style.position = 'fixed';
-                                    flash.style.top = '0'; flash.style.left = '0';
-                                    flash.style.width = '100vw'; flash.style.height = '100vh';
-                                    flash.style.backgroundColor = '#fff';
-                                    flash.style.zIndex = '9999';
-                                    flash.style.opacity = '0';
-                                    flash.style.transition = 'opacity 1.5s ease';
-                                    document.body.appendChild(flash);
+                                    const secretMessage = document.createElement('div');
+                                    secretMessage.innerHTML = '"고마워 엄마, 평생 행복해야 해!"';
+                                    secretMessage.style.position = 'absolute';
+                                    secretMessage.style.top = '50%';
+                                    secretMessage.style.left = '50%';
+                                    secretMessage.style.transform = 'translate(-50%, -50%)';
+                                    secretMessage.style.color = '#fff';
+                                    secretMessage.style.fontSize = '2.2rem';
+                                    secretMessage.style.fontWeight = '500';
+                                    secretMessage.style.textShadow = '0 0 30px rgba(255,255,255,1), 0 0 10px #ffdb58';
+                                    secretMessage.style.opacity = '0';
+                                    secretMessage.style.transition = 'opacity 2s ease';
+                                    secretMessage.style.zIndex = '30';
+                                    secretMessage.style.textAlign = 'center';
+                                    secretMessage.style.width = '90vw';
+                                    stepDiv.appendChild(secretMessage);
                                     
-                                    flash.offsetHeight; // trigger reflow
-                                    flash.style.opacity = '1';
+                                    secretMessage.offsetHeight; // trigger reflow
+                                    secretMessage.style.opacity = '1';
                                     
                                     seqTimeout(() => {
-                                        stepDiv.remove();
-                                        currentStep++;
+                                        const flash = document.createElement('div');
+                                        flash.style.position = 'fixed';
+                                        flash.style.top = '0'; flash.style.left = '0';
+                                        flash.style.width = '100vw'; flash.style.height = '100vh';
+                                        flash.style.backgroundColor = '#fff';
+                                        flash.style.zIndex = '9999';
                                         flash.style.opacity = '0';
-                                        setTimeout(() => { flash.remove(); ripple.remove(); }, 1500);
-                                        showNextMemory(1);
-                                    }, 1500);
-                                    
-                                }, 500);
+                                        flash.style.transition = 'opacity 2s ease';
+                                        document.body.appendChild(flash);
+                                        
+                                        flash.offsetHeight; // trigger reflow
+                                        flash.style.opacity = '1';
+                                        
+                                        seqTimeout(() => {
+                                            stepDiv.remove();
+                                            currentStep++;
+                                            flash.style.opacity = '0';
+                                            setTimeout(() => { flash.remove(); ripple.remove(); }, 2000);
+                                            showNextMemory(1);
+                                        }, 2000);
+                                        
+                                    }, 4000); // Let the secret message linger for 4 seconds
+                                }, 800);
                             };
                             
                             document.addEventListener('click', handleTouch);
