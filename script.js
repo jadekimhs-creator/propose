@@ -7,11 +7,11 @@ function playTypeSound() {
         audioCtx.resume();
     }
     
-    const bufferSize = audioCtx.sampleRate * 0.03; // 30ms of noise
+    const bufferSize = audioCtx.sampleRate * 0.03;
     const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1; // White noise
+        data[i] = Math.random() * 2 - 1; 
     }
     
     const noise = audioCtx.createBufferSource();
@@ -19,11 +19,10 @@ function playTypeSound() {
     
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'bandpass';
-    // Randomize frequency slightly for realistic mechanical sound
     filter.frequency.value = 4000 + Math.random() * 1000; 
     
     const gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(0.04, audioCtx.currentTime); // Volume lowered
+    gain.gain.setValueAtTime(0.04, audioCtx.currentTime); 
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
     
     noise.connect(filter);
@@ -34,8 +33,6 @@ function playTypeSound() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-
-    // Generate intro particles
     const introParticles = document.getElementById('introParticles');
     if (introParticles) {
         for (let i = 0; i < 40; i++) {
@@ -54,102 +51,109 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Typewriter effect for Intro
+// --- Progress & Skip System ---
+let totalSteps = 14; 
+let currentProgress = 0;
+let globalSkipFn = null;
+let activeSeqTimeouts = [];
+
+function updateProgress() {
+    currentProgress++;
+    const pct = Math.min((currentProgress / totalSteps) * 100, 100);
+    const bar = document.getElementById('progressBar');
+    if (bar) bar.style.width = pct + '%';
+}
+
+function skipCurrent() {
+    if (globalSkipFn) {
+        clearSeqTimeouts();
+        globalSkipFn();
+    }
+}
+
+function seqTimeout(fn, delay) {
+    const id = setTimeout(fn, delay);
+    activeSeqTimeouts.push(id);
+    return id;
+}
+
+function clearSeqTimeouts() {
+    activeSeqTimeouts.forEach(clearTimeout);
+    activeSeqTimeouts = [];
+}
+// ------------------------------
+
 const t1 = "나의 마지막 사랑 다운천사 공주님";
 const t2 = "수많은 기적들이 모여 완성된 우리의 시간.\n가장 빛나는 오늘, 너를 위해 준비했어.";
 
 function startCinematicIntro() {
-    let i = 0;
-    const speed = 160; 
+    updateProgress(); // Step 1
+    
     const el1 = document.getElementById('typewriter1');
     const el2 = document.getElementById('typewriter2');
     const startBtn = document.getElementById('startBtn');
     
+    globalSkipFn = () => {
+        el1.innerHTML = t1;
+        el2.innerHTML = t2.replace(/\n/g, '<br>');
+        el1.classList.remove('typing-cursor');
+        el2.classList.remove('typing-cursor');
+        startBtn.style.opacity = '1';
+        startBtn.style.transform = 'translateY(0)';
+        globalSkipFn = null;
+    };
+    
     if (el1 && el2) {
         el1.classList.add('typing-cursor');
-        
-        function typeWriter1() {
-            if (i < t1.length) {
-                el1.innerHTML += t1.charAt(i);
-                if (t1.charAt(i) !== ' ') playTypeSound();
-                i++;
-                setTimeout(typeWriter1, speed);
-            } else {
-                el1.classList.remove('typing-cursor');
-                el2.classList.add('typing-cursor');
-                setTimeout(typeWriter2, 500);
-            }
-        }
-        
-        let j = 0;
-        function typeWriter2() {
-            if (j < t2.length) {
-                const char = t2.charAt(j);
-                if (char === '\n') {
-                    el2.innerHTML += '<br>';
-                } else {
-                    el2.innerHTML += char;
-                    if (char !== ' ') playTypeSound();
-                }
-                j++;
-                setTimeout(typeWriter2, speed - 30);
-            } else {
-                el2.classList.remove('typing-cursor');
-                setTimeout(() => {
-                    startBtn.style.opacity = '1';
-                    startBtn.style.transform = 'translateY(0)';
-                }, 500);
-            }
-        }
-        
-        setTimeout(typeWriter1, 1000);
+        typeTextRaw(el1, t1, 160, () => {
+            el1.classList.remove('typing-cursor');
+            el2.classList.add('typing-cursor');
+            seqTimeout(() => {
+                typeTextRaw(el2, t2, 130, () => {
+                    el2.classList.remove('typing-cursor');
+                    seqTimeout(() => {
+                        startBtn.style.opacity = '1';
+                        startBtn.style.transform = 'translateY(0)';
+                        globalSkipFn = null; // Intro done
+                    }, 500);
+                });
+            }, 500);
+        });
     }
 }
 
 function beginProposal() {
     switchScreen('startScreen', 'introScreen', 1000);
+    document.getElementById('progressContainer').style.display = 'block';
+    document.getElementById('skipOverlay').style.display = 'block';
     
     const bgm = document.getElementById('bgMusic');
     if(bgm) {
         bgm.volume = 0.15;
         bgm.play().catch(e => console.log("BGM play failed", e));
     }
-    
-    // Play a silent sound to initialize audio context immediately
     playTypeSound();
-    
-    // Start intro text after transition
-    setTimeout(startCinematicIntro, 1500);
+    seqTimeout(startCinematicIntro, 1500);
 }
-
-let isBlowing = false;
 
 function switchScreen(fromId, toId, delay = 1500) {
     const fromEl = document.getElementById(fromId);
     const toEl = document.getElementById(toId);
     
     if(fromEl) fromEl.classList.remove('active');
-    setTimeout(() => {
+    setTimeout(() => { // Keep screen switches outside seqTimeouts so they always run
         if(toEl) toEl.classList.add('active');
     }, delay);
 }
 
-// Global Typewriter Engine
-function typeText(element, speed, onComplete) {
-    const text = element.getAttribute('data-text');
-    if (!text) {
-        if (onComplete) onComplete();
-        return;
-    }
-    
+// Reusable Typewriter function with Skip Support
+function typeTextRaw(element, text, speed, onComplete) {
     element.innerHTML = '';
-    element.classList.add('typing-cursor');
     let j = 0;
     
     function type() {
         if (j < text.length) {
             const char = text.charAt(j);
-            // Handle both literal '\n' characters from HTML attributes and actual newlines
             if (char === '\\' && text.charAt(j+1) === 'n') {
                 element.innerHTML += '<br>';
                 j += 2;
@@ -161,9 +165,8 @@ function typeText(element, speed, onComplete) {
                 if (char !== ' ') playTypeSound();
                 j++;
             }
-            setTimeout(type, speed);
+            seqTimeout(type, speed);
         } else {
-            element.classList.remove('typing-cursor');
             if (onComplete) onComplete();
         }
     }
@@ -174,9 +177,12 @@ function typeSequence(elements, speed, delayBetween, onComplete) {
     let index = 0;
     function next() {
         if (index < elements.length) {
-            typeText(elements[index], speed, () => {
+            elements[index].classList.add('typing-cursor');
+            const text = elements[index].getAttribute('data-text') || '';
+            typeTextRaw(elements[index], text, speed, () => {
+                elements[index].classList.remove('typing-cursor');
                 index++;
-                setTimeout(next, delayBetween);
+                seqTimeout(next, delayBetween);
             });
         } else {
             if (onComplete) onComplete();
@@ -185,30 +191,26 @@ function typeSequence(elements, speed, delayBetween, onComplete) {
     next();
 }
 
-// User memory photos and their corresponding cinematic texts
-const memories = [
-    { src: 'assets/photo1.jpg', text: '바라던 사람을 만나,\n나의 세상은 온통 따뜻한 빛이 되었어.' },
-    { src: 'assets/gom.jpg', text: '2022년 너의 생일, 함께했던 천사 곰이도 있지?\n지금쯤 하늘의 가장 밝은 별이 된 곰이가 누구보다 크게 축하해주고 있을 거야.' },
-    { src: 'assets/photo2.jpg', text: '곰이가 보내준 따뜻한 사랑과 축복 속에서,\n매일매일 서로를 더 깊이 알아가는 소중한 시간들.' },
-    { src: 'assets/eunbi.jpg', text: '우리 곁을 항상 사랑스럽게 지켜주는 은비도,\n오늘 엄마의 생일을 그 누구보다 기뻐하며 축하하고 있어.' },
-    { src: 'assets/ggyul.jpg', text: '뀰이를 만난 지 15주 2일차,\n우리에게 와준 천사가 아주 든든하고 멋진 아들이란 걸 알게 되어 너무 행복해.' },
-    { src: 'assets/photo4.jpg', text: '우리가 서로를 마주 보며 웃었던 수많은 시간들,\n그 모든 순간들이 모여 지금의 기적을 만들었어.' },
-    { src: 'assets/photo5.jpg', text: '가끔 지치고 힘든 날이 온다 해도 걱정하지 마,\n내가 항상 네 편이 되어 가장 든든하게 안아줄게.' },
-    { src: 'assets/photo6.jpg', text: '우리가 함께 그려온 지난 날들의 발자취보다,\n앞으로 함께 만들어갈 수많은 내일들이 훨씬 더 눈부실 거야.' },
-    { src: 'assets/photo3.jpg', text: '하늘의 곰이, 곁의 은비, 뱃속의 아들 뀰이, 그리고 나의 마지막 사랑 너.\n내가 평생 가장 든든한 남편이자 아빠가 되어 모두를 지켜줄게.' }
-];
-
-async function startApp() {
-    // Left intentionally blank if used later, beginProposal handles BGM now.
-}
+// ------------------------------
 
 function runCinematicSequence() {
     switchScreen('introScreen', 'prologueScreen', 1000);
+    updateProgress(); // Step 2
     
-    setTimeout(() => {
+    globalSkipFn = () => {
+        const elements = document.querySelectorAll('#prologueScreen .typewriter-element');
+        elements.forEach(el => {
+            el.innerHTML = (el.getAttribute('data-text') || '').replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+            el.classList.remove('typing-cursor');
+        });
+        switchScreen('prologueScreen', 'cakeScreen', 500);
+        startCakeScene();
+    };
+
+    seqTimeout(() => {
         const elements = document.querySelectorAll('#prologueScreen .typewriter-element');
         typeSequence(elements, 150, 1000, () => {
-            setTimeout(() => {
+            seqTimeout(() => {
                 switchScreen('prologueScreen', 'cakeScreen', 1000);
                 startCakeScene();
             }, 2500);
@@ -217,37 +219,59 @@ function runCinematicSequence() {
 }
 
 function startCakeScene() {
-    setTimeout(() => {
+    updateProgress(); // Step 3
+    globalSkipFn = () => {
+        const elements = document.querySelectorAll('#cakeScreen .typewriter-element');
+        elements.forEach(el => {
+            el.innerHTML = (el.getAttribute('data-text') || '').replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+            el.classList.remove('typing-cursor');
+        });
+        document.getElementById('cakeVisual').style.opacity = '1';
+        blowOutCandle();
+    };
+
+    seqTimeout(() => {
         const elements = document.querySelectorAll('#cakeScreen .typewriter-element');
         const cakeVisual = document.getElementById('cakeVisual');
         
         typeSequence(elements, 130, 700, () => {
             cakeVisual.style.opacity = '1';
+            globalSkipFn = blowOutCandle; // After typing, skipping just blows candle
         });
     }, 1000);
 }
 
+let isBlowing = false;
 function blowOutCandle() {
     if (isBlowing) return;
     isBlowing = true;
+    globalSkipFn = null; // Can't skip the candle blow transition itself
     
     const flame = document.getElementById('flame');
     flame.classList.add('blown-out');
     
     setTimeout(() => {
         switchScreen('cakeScreen', 'darkScreen', 1000);
-        
         setTimeout(() => {
             switchScreen('darkScreen', 'memoryScreen', 500);
             setTimeout(playMemorySequence, 1500);
         }, 2000);
-        
     }, 1000);
 }
 
-document.getElementById('candleWrapper').addEventListener('click', () => {
-    blowOutCandle();
-});
+document.getElementById('candleWrapper').addEventListener('click', blowOutCandle);
+
+const memories = [
+    { src: 'assets/photo1.jpg', text: '바라던 사람을 만나,\n나의 세상은 온통 따뜻한 빛이 되었어.' },
+    { src: 'assets/gom.jpg', text: '2022년 너의 생일, 함께했던 천사 곰이도 있지?\n지금쯤 하늘의 가장 밝은 별이 된 곰이가 누구보다 크게 축하해주고 있을 거야.', effect: 'effect-halo' },
+    { src: 'assets/photo2.jpg', text: '곰이가 보내준 따뜻한 사랑과 축복 속에서,\n매일매일 서로를 더 깊이 알아가는 소중한 시간들.' },
+    { src: 'assets/eunbi.jpg', text: '우리 곁을 항상 사랑스럽게 지켜주는 은비도,\n오늘 엄마의 생일을 그 누구보다 기뻐하며 축하하고 있어.' },
+    { src: 'assets/ggyul.jpg', text: '뀰이를 만난 지 15주 2일차,\n우리에게 와준 천사가 아주 든든하고 멋진 아들이란 걸 알게 되어 너무 행복해.', effect: 'effect-heartbeat' },
+    { src: 'assets/photo4.jpg', text: '우리가 서로를 마주 보며 웃었던 수많은 시간들,\n그 모든 순간들이 모여 지금의 기적을 만들었어.' },
+    { src: 'assets/photo5.jpg', text: '가끔 지치고 힘든 날이 온다 해도 걱정하지 마,\n내가 항상 네 편이 되어 가장 든든하게 안아줄게.' },
+    { src: 'assets/photo6.jpg', text: '우리가 함께 그려온 지난 날들의 발자취보다,\n앞으로 함께 만들어갈 수많은 내일들이 훨씬 더 눈부실 거야.' },
+    { src: 'assets/photo3.jpg', text: '하늘의 곰이, 곁의 은비, 뱃속의 아들 뀰이, 그리고 나의 마지막 사랑 너.\n내가 평생 가장 든든한 남편이자 아빠가 되어 모두를 지켜줄게.', effect: 'effect-flare' }
+];
 
 function playMemorySequence() {
     const container = document.getElementById('memoryContainer');
@@ -255,6 +279,7 @@ function playMemorySequence() {
     
     function showNextMemory() {
         if (currentStep >= memories.length) {
+            globalSkipFn = null;
             switchScreen('memoryScreen', 'proposalScreen', 1500);
             createFlowers();
             scatterMemoriesBackground();
@@ -262,12 +287,12 @@ function playMemorySequence() {
             return;
         }
         
+        updateProgress(); // Steps 4 to 12
+        
         const mem = memories[currentStep];
         const stepDiv = document.createElement('div');
         stepDiv.className = 'memory-step';
-        if (mem.effect) {
-            stepDiv.classList.add(mem.effect);
-        }
+        if (mem.effect) stepDiv.classList.add(mem.effect);
         
         const bgImg = document.createElement('img');
         bgImg.src = mem.src;
@@ -280,25 +305,36 @@ function playMemorySequence() {
         
         const p = document.createElement('p');
         p.className = 'typewriter-element';
-        p.setAttribute('data-text', mem.text);
         
         stepDiv.appendChild(img);
         stepDiv.appendChild(p);
         container.appendChild(stepDiv);
         
-        setTimeout(() => {
-            stepDiv.classList.add('show');
+        globalSkipFn = () => {
+            p.innerHTML = mem.text.replace(/\n/g, '<br>');
+            p.classList.remove('typing-cursor');
+            stepDiv.classList.remove('show');
             setTimeout(() => {
-                // Type moderately for memories so photos stay longer
-                typeText(p, 100, () => {
-                    setTimeout(() => {
+                stepDiv.remove();
+                currentStep++;
+                showNextMemory();
+            }, 600);
+        };
+        
+        seqTimeout(() => {
+            stepDiv.classList.add('show');
+            seqTimeout(() => {
+                p.classList.add('typing-cursor');
+                typeTextRaw(p, mem.text, 90, () => {
+                    p.classList.remove('typing-cursor');
+                    seqTimeout(() => {
                         stepDiv.classList.remove('show');
-                        setTimeout(() => {
+                        seqTimeout(() => {
                             stepDiv.remove();
                             currentStep++;
                             showNextMemory();
                         }, 1000); 
-                    }, 2500); 
+                    }, 2800); 
                 });
             }, 500);
         }, 100);
@@ -329,7 +365,6 @@ function createFlowers() {
 
 function scatterMemoriesBackground() {
     const container = document.getElementById('scatteredMemories');
-    
     memories.forEach((mem, index) => {
         setTimeout(() => {
             const polaroid = document.createElement('div');
@@ -345,8 +380,6 @@ function scatterMemoriesBackground() {
             
             const img = document.createElement('img');
             img.src = mem.src;
-            img.onerror = () => { polaroid.style.display = 'none'; };
-            
             polaroid.style.width = `${Math.random() * 80 + 120}px`; 
             polaroid.style.height = `${parseFloat(polaroid.style.width) * 1.2}px`;
             
@@ -363,7 +396,10 @@ function scatterMemoriesBackground() {
 }
 
 function startProposalScene() {
-    setTimeout(() => {
+    updateProgress(); // Step 13
+    document.getElementById('skipOverlay').style.display = 'none'; // Don't allow skipping proposal buttons
+    
+    seqTimeout(() => {
         const elements = document.querySelectorAll('#proposalScreen .typewriter-element');
         const btns = document.getElementById('proposalBtns');
         
@@ -375,18 +411,21 @@ function startProposalScene() {
 }
 
 const noBtn = document.getElementById('noBtn');
-function moveNoBtn() {
-    noBtn.style.position = 'fixed';
-    const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40) + 20;
-    const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40) + 20;
-    noBtn.style.left = `${x}px`;
-    noBtn.style.top = `${y}px`;
+if (noBtn) {
+    function moveNoBtn() {
+        noBtn.style.position = 'fixed';
+        const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40) + 20;
+        const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40) + 20;
+        noBtn.style.left = `${x}px`;
+        noBtn.style.top = `${y}px`;
+    }
+    noBtn.addEventListener('mouseover', moveNoBtn);
+    noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoBtn(); });
 }
-noBtn.addEventListener('mouseover', moveNoBtn);
-noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoBtn(); });
 
 function acceptProposal() {
-    // 1. Cinematic White Flash
+    updateProgress(); // Step 14
+    
     const flash = document.createElement('div');
     flash.style.position = 'fixed';
     flash.style.top = '0'; flash.style.left = '0'; 
@@ -400,7 +439,6 @@ function acceptProposal() {
     setTimeout(() => { flash.style.opacity = '0'; }, 100);
     setTimeout(() => { flash.remove(); }, 3000);
 
-    // 2. Emotional Music Swell
     const bgm = document.getElementById('bgMusic');
     if (bgm) {
         let vol = bgm.volume;
@@ -414,28 +452,22 @@ function acceptProposal() {
         }, 300);
     }
 
-    // 3. Switch Screen
     switchScreen('proposalScreen', 'successScreen', 500);
     
-    // Create Starfield Effect
     const starfield = document.getElementById('starfield');
     if (starfield) {
         for (let i = 0; i < 150; i++) {
             setTimeout(() => {
                 const star = document.createElement('div');
                 star.classList.add('star');
-                
                 const size = Math.random() * 3 + 1;
                 star.style.width = `${size}px`;
                 star.style.height = `${size}px`;
-                
                 star.style.left = `${Math.random() * 100}vw`;
                 star.style.top = `${Math.random() * 100}vh`;
-                
                 star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
                 star.style.setProperty('--delay', `${Math.random() * 2}s`);
                 star.style.setProperty('--max-opacity', `${Math.random() * 0.7 + 0.3}`);
-                
                 starfield.appendChild(star);
             }, i * 20);
         }
@@ -449,7 +481,6 @@ function acceptProposal() {
         setTimeout(() => {
             const elements = document.querySelectorAll('#successScreen .typewriter-element');
             typeSequence(elements, 160, 900, () => {
-                // 4. Dramatic Confetti after typing finishes!
                 if (window.confetti) {
                     const duration = 15 * 1000;
                     const animationEnd = Date.now() + duration;
@@ -458,7 +489,6 @@ function acceptProposal() {
                     const interval = setInterval(function() {
                         const timeLeft = animationEnd - Date.now();
                         if (timeLeft <= 0) return clearInterval(interval);
-                        
                         const particleCount = 20 * (timeLeft / duration);
                         confetti(Object.assign({}, defaults, { 
                             particleCount,
