@@ -399,9 +399,19 @@ function playMemorySequence() {
                         seqTimeout(() => {
                             prompt.classList.add('show');
                             
+                            const bgm = document.getElementById('bgMusic');
+                            if (bgm) {
+                                bgm.pause();
+                            }
+                            
                             const handleTouch = (e) => {
                                 document.removeEventListener('click', handleTouch);
                                 document.removeEventListener('touchstart', handleTouch);
+                                
+                                if (bgm) {
+                                    bgm.volume = 1.0;
+                                    bgm.play();
+                                }
                                 
                                 prompt.style.opacity = '0';
                                 
