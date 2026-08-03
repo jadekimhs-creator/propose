@@ -276,14 +276,14 @@ document.getElementById('candleWrapper').addEventListener('click', blowOutCandle
 
 const memories = [
     { src: 'assets/photo1.jpg', text: '바라던 사람을 만나,\n나의 세상은 온통 따뜻한 빛이 되었어.' },
-    { src: 'assets/gom.jpg', text: '2022년 너의 생일, 함께했던 천사 곰이도 있지?\n지금쯤 하늘의 가장 밝은 별이 된 곰이가 누구보다 크게 축하해주고 있을 거야.', effect: 'effect-halo' },
-    { src: 'assets/photo2.jpg', text: '곰이가 보내준 따뜻한 사랑과 축복 속에서,\n매일매일 서로를 더 깊이 알아가는 소중한 시간들.' },
+    { src: 'assets/photo2.jpg', text: '매일매일 서로를 더 깊이 알아가고,\n함께 웃으며 만들어온 소중한 시간들.' },
     { src: 'assets/eunbi.jpg', text: '우리 곁을 항상 사랑스럽게 지켜주는 은비도,\n오늘 엄마의 생일을 그 누구보다 기뻐하며 축하하고 있어.' },
     { src: 'assets/ggyul.jpg', text: '뀰이를 만난 지 15주 2일차,\n우리에게 와준 천사가 아주 든든하고 멋진 아들이란 걸 알게 되어 너무 행복해.', effect: 'effect-heartbeat' },
     { src: 'assets/photo4.jpg', text: '우리가 서로를 마주 보며 웃었던 수많은 시간들,\n그 모든 순간들이 모여 지금의 기적을 만들었어.' },
     { src: 'assets/photo5.jpg', text: '가끔 지치고 힘든 날이 온다 해도 걱정하지 마,\n내가 항상 네 편이 되어 가장 든든하게 안아줄게.' },
-    { src: 'assets/photo6.jpg', text: '우리가 함께 그려온 지난 날들의 발자취보다,\n앞으로 함께 만들어갈 수많은 내일들이 훨씬 더 눈부실 거야.' },
-    { src: 'assets/photo3.jpg', text: '하늘의 곰이, 곁의 은비, 뱃속의 아들 뀰이, 그리고 나의 마지막 사랑 너.\n내가 평생 가장 든든한 남편이자 아빠가 되어 모두를 지켜줄게.', effect: 'effect-flare' }
+    { src: 'assets/photo6.jpg', text: '앞으로 우리가 함께 만들어갈 수많은 내일들은,\n지금보다 훨씬 더 눈부시고 아름다울 거야.' },
+    { src: 'assets/photo3.jpg', text: '곁의 은비, 뱃속의 멋진 아들 뀰이, 그리고 나의 영원한 사랑 다운천사.\n내가 평생 가장 든든한 남편이자 아빠가 되어 모두를 지켜줄게.', effect: 'effect-flare' },
+    { src: 'assets/gom.jpg', text: '그리고 2022년 너의 생일, 함께했던 우리의 천사 곰이.\n하늘의 가장 밝은 별이 된 곰이가 지금 이 순간, 그 누구보다 우리를 축복하며 가장 크게 환호하고 있을 거야.', effect: 'effect-halo' }
 ];
 
 function playMemorySequence() {
