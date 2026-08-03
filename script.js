@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Typewriter effect for Intro
-const t1 = "To. 나의 우주인 너에게";
+const t1 = "나의 마지막 사랑 다운천사 공주님";
 const t2 = "수많은 기적들이 모여 완성된 우리의 시간.\n가장 빛나는 오늘, 너를 위해 준비했어.";
 
 function startCinematicIntro() {
