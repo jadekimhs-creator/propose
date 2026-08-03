@@ -279,6 +279,41 @@ body {
     min-height: 2em;
 }
 
+/* Special Memory Effects */
+.memory-step.show.effect-halo img {
+    animation: haloGlow 3s infinite alternate ease-in-out;
+}
+@keyframes haloGlow {
+    0% { box-shadow: 0 50px 100px rgba(0,0,0,1), 0 0 60px rgba(255,255,255,0.4); filter: brightness(1.05) contrast(1.1); }
+    100% { box-shadow: 0 50px 100px rgba(0,0,0,1), 0 0 140px rgba(255,255,255,0.9); filter: brightness(1.2) contrast(1.15); }
+}
+
+.memory-step.show.effect-heartbeat img {
+    animation: heartbeatShadow 1.5s infinite;
+}
+@keyframes heartbeatShadow {
+    0%, 100% { box-shadow: 0 50px 100px rgba(0,0,0,1), 0 0 80px rgba(229,168,114,0.3); }
+    20% { box-shadow: 0 50px 100px rgba(0,0,0,1), 0 0 150px rgba(229,168,114,0.8); }
+    40% { box-shadow: 0 50px 100px rgba(0,0,0,1), 0 0 90px rgba(229,168,114,0.5); }
+    60% { box-shadow: 0 50px 100px rgba(0,0,0,1), 0 0 140px rgba(229,168,114,0.7); }
+}
+
+.memory-step.show.effect-flare::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -150%;
+    width: 100%; height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);
+    transform: skewX(-25deg);
+    animation: flareSweep 6s infinite;
+    pointer-events: none;
+    z-index: 10;
+}
+@keyframes flareSweep {
+    0%, 30% { left: -150%; }
+    70%, 100% { left: 150%; }
+}
+
 /* Scattered Memories */
 #scatteredMemories {
     position: absolute;

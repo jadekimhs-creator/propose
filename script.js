@@ -265,6 +265,9 @@ function playMemorySequence() {
         const mem = memories[currentStep];
         const stepDiv = document.createElement('div');
         stepDiv.className = 'memory-step';
+        if (mem.effect) {
+            stepDiv.classList.add(mem.effect);
+        }
         
         const img = document.createElement('img');
         img.src = mem.src;
