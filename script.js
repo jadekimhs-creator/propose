@@ -401,8 +401,8 @@ function playMemorySequence() {
                             
                             const bgm = document.getElementById('bgMusic');
                             if (bgm) {
-                                // Lower volume drastically for the quiet moment
-                                bgm.volume = 0.15;
+                                // Lower volume even more drastically
+                                bgm.volume = 0.05;
                             }
                             
                             const handleTouch = (e) => {

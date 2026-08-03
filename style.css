@@ -338,8 +338,8 @@ body {
 }
 
 @keyframes gomiZoom {
-    0% { transform: scale(2.2) translate(12%, 5%); }
-    100% { transform: scale(2.6) translate(12%, 5%); }
+    0% { transform: scale(2.2) translate(12%, 18%); }
+    100% { transform: scale(2.6) translate(12%, 18%); }
 }
 
 /* Touch interaction styles */
