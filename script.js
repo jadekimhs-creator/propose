@@ -269,6 +269,11 @@ function playMemorySequence() {
             stepDiv.classList.add(mem.effect);
         }
         
+        const bgImg = document.createElement('img');
+        bgImg.src = mem.src;
+        bgImg.className = 'memory-bg';
+        stepDiv.appendChild(bgImg);
+        
         const img = document.createElement('img');
         img.src = mem.src;
         img.onerror = () => { img.style.display = 'none'; };
