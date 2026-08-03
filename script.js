@@ -385,14 +385,82 @@ function playMemorySequence() {
                 const typeSpeed = (mem.effect === 'effect-halo') ? 140 : 90; // Slower, dramatic typing for Gomi
                 typeTextRaw(p, mem.text, typeSpeed, () => {
                     p.classList.remove('typing-cursor');
-                    seqTimeout(() => {
-                        stepDiv.classList.remove('show');
+                    
+                    if (mem.effect === 'effect-halo') {
+                        // Interactive Touch Sequence for Gomi
+                        globalSkipFn = null;
+                        globalSkipBackFn = null;
+                        
+                        const prompt = document.createElement('div');
+                        prompt.className = 'touch-prompt';
+                        prompt.innerHTML = '스탠바이미 화면 속 곰이를<br>한 번만 쓰다듬어 줄래?';
+                        stepDiv.appendChild(prompt);
+                        
                         seqTimeout(() => {
-                            stepDiv.remove();
-                            currentStep++;
-                            showNextMemory(1);
-                        }, 1000); 
-                    }, (mem.effect === 'effect-halo') ? 4000 : 2800); // Wait longer for Gomi
+                            prompt.classList.add('show');
+                            
+                            const handleTouch = (e) => {
+                                document.removeEventListener('click', handleTouch);
+                                document.removeEventListener('touchstart', handleTouch);
+                                
+                                prompt.style.opacity = '0';
+                                
+                                const ripple = document.createElement('div');
+                                ripple.className = 'ripple-effect';
+                                
+                                let clientX = window.innerWidth / 2;
+                                let clientY = window.innerHeight / 2;
+                                if (e.type === 'touchstart' && e.touches.length > 0) {
+                                    clientX = e.touches[0].clientX;
+                                    clientY = e.touches[0].clientY;
+                                } else if (e.clientX) {
+                                    clientX = e.clientX;
+                                    clientY = e.clientY;
+                                }
+                                ripple.style.left = `${clientX}px`;
+                                ripple.style.top = `${clientY}px`;
+                                document.body.appendChild(ripple);
+                                
+                                seqTimeout(() => {
+                                    const flash = document.createElement('div');
+                                    flash.style.position = 'fixed';
+                                    flash.style.top = '0'; flash.style.left = '0';
+                                    flash.style.width = '100vw'; flash.style.height = '100vh';
+                                    flash.style.backgroundColor = '#fff';
+                                    flash.style.zIndex = '9999';
+                                    flash.style.opacity = '0';
+                                    flash.style.transition = 'opacity 1.5s ease';
+                                    document.body.appendChild(flash);
+                                    
+                                    flash.offsetHeight; // trigger reflow
+                                    flash.style.opacity = '1';
+                                    
+                                    seqTimeout(() => {
+                                        stepDiv.remove();
+                                        currentStep++;
+                                        flash.style.opacity = '0';
+                                        setTimeout(() => { flash.remove(); ripple.remove(); }, 1500);
+                                        showNextMemory(1);
+                                    }, 1500);
+                                    
+                                }, 500);
+                            };
+                            
+                            document.addEventListener('click', handleTouch);
+                            document.addEventListener('touchstart', handleTouch);
+                            
+                        }, 2000);
+                        
+                    } else {
+                        seqTimeout(() => {
+                            stepDiv.classList.remove('show');
+                            seqTimeout(() => {
+                                stepDiv.remove();
+                                currentStep++;
+                                showNextMemory(1);
+                            }, 1000); 
+                        }, 2800); 
+                    }
                 });
             }, 500);
         }, 100);
