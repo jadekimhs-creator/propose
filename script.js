@@ -189,9 +189,11 @@ function typeSequence(elements, speed, delayBetween, onComplete) {
 const memories = [
     { src: 'assets/photo1.jpg', text: '바라던 사람을 만나,\n나의 세상은 온통 따뜻한 빛이 되었어.' },
     { src: 'assets/gom.jpg', text: '2022년 너의 생일, 함께했던 천사 곰이도 있지?\n지금쯤 하늘의 가장 밝은 별이 된 곰이가 누구보다 크게 축하해주고 있을 거야.' },
-    { src: 'assets/photo2.jpg', text: '곰이가 보내준 따뜻한 사랑까지 듬뿍 받아,\n이제는 완전한 가족이 되어 맞이하는 특별한 생일.' },
-    { src: 'assets/ggyul.jpg', text: '뀰이를 만난 지 15주 2일차,\n우리 셋이서 함께할 찬란한 나날들이 너무도 기대돼.' },
-    { src: 'assets/photo3.jpg', text: '마음의 응원을 가득 곰이, 뱃속 뀰이, 그리고 우리 두 사람.\n내가 가장 든든한 남편이자 아빠가 되어 평생 지켜줄게.' }
+    { src: 'assets/photo2.jpg', text: '곰이가 보내준 따뜻한 사랑과 축복 속에서,\n매일매일 서로를 더 깊이 알아가는 소중한 시간들.' },
+    { src: 'assets/eunbi.jpg', text: '우리 곁을 항상 사랑스럽게 지켜주는 은비도,\n오늘 엄마의 생일을 그 누구보다 기뻐하며 축하하고 있어.' },
+    { src: 'assets/ggyul.jpg', text: '뀰이를 만난 지 15주 2일차,\n우리에게 와준 천사가 아주 든든하고 멋진 아들이란 걸 알게 되어 너무 행복해.' },
+    { src: 'assets/photo4.jpg', text: '우리가 함께 그려온 발자취보다,\n앞으로 함께 만들어갈 미래가 훨씬 더 찬란하고 아름다울 거야.' },
+    { src: 'assets/photo3.jpg', text: '하늘의 곰이, 곁의 은비, 뱃속의 아들 뀰이, 그리고 나의 마지막 사랑 너.\n내가 평생 가장 든든한 남편이자 아빠가 되어 모두를 지켜줄게.' }
 ];
 
 async function startApp() {
